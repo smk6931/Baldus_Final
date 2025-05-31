@@ -51,13 +51,13 @@ void UInputComp::BeginPlay()
 	TestPlayer->CameraBoom->SetWorldRotation(FRotator(-45,-90,0));
 
     if (!Pc) return;
-
-	BindInputActions();
-	SetMappingContext();
 	
-	// FTimerHandle TimerHandle;
-	// GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
-	// {},1.0f,false);
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
+	{
+		BindInputActions();
+		SetMappingContext();
+	},1.0f,false);
 }
 
 

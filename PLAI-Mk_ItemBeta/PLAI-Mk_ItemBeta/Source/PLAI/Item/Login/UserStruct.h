@@ -7,9 +7,6 @@
 #include "UObject/Object.h"
 #include "UserStruct.generated.h"
 
-
-
-
 class ULogItemComp;
 
 USTRUCT(BlueprintType,Blueprintable)
