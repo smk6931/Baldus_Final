@@ -16,6 +16,10 @@ class PLAI_API UUIChaMain : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	
+	UPROPERTY(EditAnywhere)
+    UFont* CustomFont;
+	
 	// 왼족 위 캐릭터 상세창
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Name;
@@ -28,6 +32,9 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UVerticalBox* TraitsName;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* Traits;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UVerticalBox* TraitsStatNameBox;
