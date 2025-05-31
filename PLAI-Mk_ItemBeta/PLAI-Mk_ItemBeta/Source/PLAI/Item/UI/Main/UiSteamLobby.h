@@ -24,6 +24,7 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UScrollBox* ScrollBox;
+	
 	void AddScrollBox(FString SessionName);
 	
 	UPROPERTY(EditAnywhere)
