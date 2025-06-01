@@ -50,14 +50,16 @@ void UInputComp::BeginPlay()
 	Pc = Cast<APlayerController>(TestPlayer->GetController());
 	TestPlayer->CameraBoom->SetWorldRotation(FRotator(-45,-90,0));
 
+	BindInputActions();	
+
     if (!Pc) return;
 	
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
-	{
-		BindInputActions();
-		SetMappingContext();
-	},1.0f,false);
+	// FTimerHandle TimerHandle;
+	// GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
+	// {
+	// 	BindInputActions();
+	// 	SetMappingContext();
+	// },1.0f,false);
 }
 
 
@@ -87,17 +89,15 @@ void UInputComp::SetMappingContext()
 	{ UE_LOG(LogTemp, Error, TEXT("InputComp TestPlayer is locallyControlled 있음 서버니 클라니? %s"),
 			TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라")) }
 	
-	if (ULocalPlayer* LP = Pc->GetLocalPlayer())
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LP->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
-		{
-			Subsystem->AddMappingContext(InputMappingContext, 0);
-			{
-				UE_LOG(LogTemp, Error, TEXT("InputComp TestPlayer is AddMapping [있음] 서버니 클라니? %s"),
-				TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라"));
-			}
-		}
-	}
+	// if (ULocalPlayer* LP = Pc->GetLocalPlayer())
+	// {
+	// 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LP->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+	// 	{
+	// 		Subsystem->AddMappingContext(InputMappingContext, 0);
+	// 		{ UE_LOG(LogTemp, Error, TEXT("InputComp TestPlayer is AddMapping [있음] 서버니 클라니? %s"),
+	// 			TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라")); }
+	// 	}
+	// }
 }
 
 void UInputComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

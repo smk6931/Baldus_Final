@@ -53,7 +53,6 @@ void UUiWorldMap::SetRefreshPlayerList()
 		{
 			if (ATestPlayer* TP = Cast<ATestPlayer>(PS->GetPawn()))
 			{
-				if (!TP -> IsLocallyControlled())return;
 				UIWorldPlayerIcon = CreateWidget<UUiWorldPlayerIcon>(GetWorld(),UiWorldPlayerIconFactory);
 
 				MiniMapCanvasIcon->AddChild(UIWorldPlayerIcon);
@@ -89,13 +88,27 @@ void UUiWorldMap::SetPlayerIconMinimap()
 	
 		if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapCanvasIcon->GetChildAt(i)->Slot))
 		{
-			MiniMapCanvasIcon->GetChildAt(i)->SetRenderTransformAngle(Yaw - 90);
-			MaterialMapDynamic->SetVectorParameterValue(TEXT("CenterOffset"),FLinearColor(U, V, 0.f, 0.f));
-
-			if (bExtendMap == true)
-			{ CanvasSlot->SetPosition(PixelPos); }
+			// MiniMapCanvasIcon->GetChildAt(i)->SetRenderTransformAngle(Yaw - 90);
+			// MaterialMapDynamic->SetVectorParameterValue(TEXT("CenterOffset"),FLinearColor(U, V, 0.f, 0.f));
+			if (TestPlayers[i]->InvenComp && TestPlayers[i]->InvenComp->MenuInven && TestPlayers[i]->InvenComp->MenuInven->Wbp_UiWorldMap &&
+				TestPlayers[i]->InvenComp->MenuInven->Wbp_UiWorldMap == this)
+			{
+				CanvasSlot->SetPosition(FVector2d(125,125));
+				MiniMapCanvasIcon->GetChildAt(i)->SetRenderTransformAngle(Yaw - 90);
+				MaterialMapDynamic->SetVectorParameterValue(TEXT("CenterOffset"),FLinearColor(U, V, 0.f, 0.f));
+			}
 			else
-			{ CanvasSlot->SetPosition(FVector2d(125,125)); }
+			{
+				// CanvasSlot->SetPosition(PixelPos);
+			}
+			if (bExtendMap == true)
+			{
+				CanvasSlot->SetPosition(PixelPos);
+			}
+			// else
+			// {
+			// 	CanvasSlot->SetPosition(FVector2d(125,125));
+			// }
 		}
 		else { UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::SetPlayer MinmapVector Error")); }
 	}
@@ -199,3 +212,38 @@ FReply UUiWorldMap::NativeOnMouseWheel(const FGeometry& InGeometry, const FPoint
 // }
 
 // SetPlayerMinmapVector(TestPlayer->GetActorLocation());
+
+// if (!TP -> IsLocallyControlled())return;
+
+
+
+// 미니맵 확대하고 축소하기
+
+// for (int i = 0; i < TestPlayers.Num(); i++)
+// {
+// 	if (!TestPlayers[i])
+// 	{
+// 		SetRefreshPlayerList();
+// 		UE_LOG(LogTemp,Warning,TEXT("UiWorldMap SetRefresh하고 한번더 체크 플레이어 갯수 [%d] 없냐?"),TestPlayers.Num()) return;
+// 	}
+// 	float U = (TestPlayers[i]->GetActorLocation().X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
+// 	float V = (TestPlayers[i]->GetActorLocation().Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
+// 	
+// 	U = FMath::Clamp(U, 0.f, 1.f);
+// 	V = FMath::Clamp(V, 0.f, 1.f);
+//
+// 	FVector2D PixelPos = FVector2D(U * MiniMapSize.X, V * MiniMapSize.Y);
+// 	float Yaw = TestPlayers[i]->GetActorRotation().Yaw;
+//
+// 	if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapCanvasIcon->GetChildAt(i)->Slot))
+// 	{
+// 		MiniMapCanvasIcon->GetChildAt(i)->SetRenderTransformAngle(Yaw - 90);
+// 		MaterialMapDynamic->SetVectorParameterValue(TEXT("CenterOffset"),FLinearColor(U, V, 0.f, 0.f));
+//
+// 		if (bExtendMap == true)
+// 		{ CanvasSlot->SetPosition(PixelPos); }
+// 		else
+// 		{ CanvasSlot->SetPosition(FVector2d(125,125)); }
+// 	}
+// 	else { UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::SetPlayer MinmapVector Error")); }
+// }

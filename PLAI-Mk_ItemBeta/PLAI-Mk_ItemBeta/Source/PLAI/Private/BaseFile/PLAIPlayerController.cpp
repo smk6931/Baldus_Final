@@ -111,6 +111,7 @@ void APLAIPlayerController::SetupInputComponent()
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
 		Subsystem->AddMappingContext(DefaultMappingContext,1);
+		Subsystem->AddMappingContext(InputMappingContext,0);
 	}
 
 	// Set up action bindings
