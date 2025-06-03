@@ -66,6 +66,7 @@ void UUiWorldMap::SetRefreshPlayerList()
 			}
 		}
 	}
+	
 }
 
 void UUiWorldMap::SetPlayerIconMinimap()
