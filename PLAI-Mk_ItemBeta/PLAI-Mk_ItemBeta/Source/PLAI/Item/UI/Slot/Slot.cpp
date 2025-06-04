@@ -201,7 +201,6 @@ void USlot::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent&
 			// ItemDetail->SetPositionInViewport(MousePos);
 			ItemDetail->SetPositionInViewport(CenterPos + FVector2D(-250,-250), false);
 		}
-		// FVector2d MousePos = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld()) + FVector2d(-100,100);
 	}
 }
 

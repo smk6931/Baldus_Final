@@ -50,16 +50,16 @@ void UInputComp::BeginPlay()
 	Pc = Cast<APlayerController>(TestPlayer->GetController());
 	TestPlayer->CameraBoom->SetWorldRotation(FRotator(-45,-90,0));
 
-	BindInputActions();	
-
     if (!Pc) return;
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle,this,&UInputComp::BindInputActions,1,false);
+	// BindInputActions();
 	
+	// SetMappingContext();
 	// FTimerHandle TimerHandle;
 	// GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
-	// {
-	// 	BindInputActions();
-	// 	SetMappingContext();
-	// },1.0f,false);
+	// {},1.0f,false);
 }
 
 
@@ -89,24 +89,22 @@ void UInputComp::SetMappingContext()
 	{ UE_LOG(LogTemp, Error, TEXT("InputComp TestPlayer is locallyControlled 있음 서버니 클라니? %s"),
 			TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라")) }
 	
-	// if (ULocalPlayer* LP = Pc->GetLocalPlayer())
-	// {
-	// 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LP->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
-	// 	{
-	// 		Subsystem->AddMappingContext(InputMappingContext, 0);
-	// 		{ UE_LOG(LogTemp, Error, TEXT("InputComp TestPlayer is AddMapping [있음] 서버니 클라니? %s"),
-	// 			TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라")); }
-	// 	}
-	// }
+	if (ULocalPlayer* LP = Pc->GetLocalPlayer())
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LP->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+		{
+			Subsystem->AddMappingContext(InputMappingContext, 0);
+			{
+				UE_LOG(LogTemp, Error, TEXT("InputComp TestPlayer is AddMapping [있음] 서버니 클라니? %s"),
+				TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라"));
+			}
+		}
+	}
 }
 
 void UInputComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	// if (TestPlayer->IsLocallyControlled() && Pc->WasInputKeyJustPressed(EKeys::T))
-	// { FString JsonString;
-	// 	FJsonObjectConverter::UStructToJsonObjectString(TestPlayer->LoginComp->UserFullInfo,JsonString);
-	// 	UE_LOG(LogTemp,Warning,TEXT("InputComp TKey JsonString [%s]"),*JsonString) }
 }
 
 void UInputComp::On_Equip()
@@ -215,11 +213,7 @@ void UInputComp::On_LeftMouseStart()
 		}
 	}
 	
-	// 턴제 플레이어
-	// if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(Hit.GetActor()))
-	// {
-	// 	
-	// }
+	
 	TestPlayer->GetController()->StopMovement();
 	TimeCamera = 0;
 }
