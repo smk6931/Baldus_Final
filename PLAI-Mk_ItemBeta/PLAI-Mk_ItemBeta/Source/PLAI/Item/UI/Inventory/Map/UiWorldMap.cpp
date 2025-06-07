@@ -156,14 +156,11 @@ void UUiWorldMap::SetRefreshPlayerList()
 	{
 	    UIWorldMapGuideIcon = CreateWidget<UUIWorldMapGuide>(GetWorld(),UIWorldMapGuideFactory);
 		if (UIWorldMapGuideIcon)
-		{
-			MiniMapCanvasIconQuest->AddChild(UIWorldMapGuideIcon);
-		}
+		{ MiniMapCanvasIconQuest->AddChild(UIWorldMapGuideIcon); }
+
 		if (UCanvasPanelSlot* Icon = Cast<UCanvasPanelSlot>(UIWorldMapGuideIcon->Slot))
-		{
-			Icon->SetAlignment(FVector2D(0.5,0.5));
-			Icon->SetSize(FVector2d(60,60));
-		}
+		{ Icon->SetAlignment(FVector2D(0.5,0.5));
+			Icon->SetSize(FVector2d(60,60)); }
 	}
 }
 
@@ -207,24 +204,29 @@ void UUiWorldMap::SetPlayerIconMinimap()
 			}
 			else { UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::SetPlayer MinmapVector Error")); }
 		}
-	
-		for (int i = 0; i < QuestActors.Num(); i++)
+		
+		if (QuestActors.Num() >= 0)
 		{
-			FVector Location = QuestActors[i]->GetActorLocation();
-		
-			float U = (Location.X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
-			float V = (Location.Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
-
-			U = FMath::Clamp(U, 0.f, 1.f);
-			V = FMath::Clamp(V, 0.f, 1.f);
-		
-			FVector2D PixelPos = FVector2D(U * MiniMapSize.X, V * MiniMapSize.Y);
-
-			if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapCanvasIconQuest->GetChildAt(i)->Slot))
+			for (int i = 0; i < QuestActors.Num(); i++)
 			{
-				if (bExtendMap == true)
+				if (!IsValid(QuestActors[i]))
+				{ continue; }
+				FVector Location = QuestActors[i]->GetActorLocation();
+		
+				float U = (Location.X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
+				float V = (Location.Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
+
+				U = FMath::Clamp(U, 0.f, 1.f);
+				V = FMath::Clamp(V, 0.f, 1.f);
+		
+				FVector2D PixelPos = FVector2D(U * MiniMapSize.X, V * MiniMapSize.Y);
+
+				if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapCanvasIconQuest->GetChildAt(i)->Slot))
 				{
-					CanvasSlot->SetPosition(PixelPos);
+					if (bExtendMap == true)
+					{
+						CanvasSlot->SetPosition(PixelPos);
+					}
 				}
 			}
 		}

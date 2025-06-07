@@ -103,7 +103,7 @@ void AMonster::Dead()
 		{ ItemMaster->SetActorScale3D(FVector(4,4,4)); }
 		else
 		{ ItemMaster->SetActorScale3D(FVector(1.3,1.3,1.3));}
-		ItemMaster->BoxComp->SetSimulatePhysics(true);
+		// ItemMaster->BoxComp->SetSimulatePhysics(true);
 		
 		if (ItemStructTable->ItemIndexDetail == 2)
 		{
