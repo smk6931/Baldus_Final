@@ -2,6 +2,8 @@
 
 
 #include "InvenComp.h"
+
+#include "CreComp.h"
 #include "JsonObjectConverter.h"
 #include "StoreComp.h"
 #include "Components/BoxComponent.h"
@@ -97,6 +99,9 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 
 	if (TestPlayer->IsLocallyControlled() && ItemDataTable && PC->WasInputKeyJustPressed(EKeys::Seven))
 	{
+		TArray<FName>RawNames = ItemDataTable->GetRowNames();
+		FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(RawNames[33],"InvenComp");
+		MenuInven->WBP_SlotCre->ItemStructTable = *ItemStructTable;
 		Server_SpawnCreature();
 		// MenuInven->Wbp_UiQuest->NextQuest(0,FString("Chapter1"),FString("QuesContentt"));
 	}
@@ -176,8 +181,8 @@ void UInvenComp::Client_GetCreature_Implementation()
 {
 	TArray<FName> RawNames = ItemDataTable->GetRowNames();
 	if (RawNames.IsValidIndex(33))
-	{ UE_LOG(LogTemp,Warning,TEXT("InvenComp 소환수 소환 5번키 입력"))
-		FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(RawNames[33],TEXT("InvenComp100"));
+	{ UE_LOG(LogTemp,Warning,TEXT("InvenComp 소환수 소환 7번키 입력"))
+		FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(RawNames[33],TEXT("InvenComp180"));
 		TestPlayer->InvenComp->MenuInven->WBP_SlotCre->SpawnCreature(*ItemStructTable,TestPlayer); }
 	else
 	{ UE_LOG(LogTemp,Warning,TEXT("InvenComp 소환수 소환 5번키 입력 없는데?")) }

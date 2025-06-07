@@ -228,9 +228,11 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 			if (ACreBullet* Bullet = GetWorld()->SpawnActor<ACreBullet>(CreBulletFactory))
 			{
 				Bullet->CreDraFsm = this;
+				Bullet->SetActorScale3D(FVector(1.5,1.5,1.5));
 				Bullet->SetActorLocation(Dragon->GetActorLocation()+Dragon->GetActorForwardVector() * 75);
-				FVector dist = Dragon->GetActorLocation() - NearMonster->GetActorLocation();
-				Bullet->ProjectileComp->Velocity = dist.GetSafeNormal() * -1500;
+				FVector dist = NearMonster->GetActorLocation() - Dragon->GetActorLocation();
+				DrawDebugSphere(GetWorld(),NearMonster->GetActorLocation(),50,15,FColor::Red,false,1.0f);
+				Bullet->ProjectileComp->Velocity = dist.GetSafeNormal() * 1500;
 			}
 			// AttackMonster(NearMonster);
 			// NearMonster->MonsterStruct.CurrentHp -= Dragon->CreFsm->CreStruct.Atk;
