@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "PLAI/Item/Monster/MonsterStruct.h"
 #include "MonSpawn.generated.h"
 
 UENUM(BlueprintType)
@@ -32,8 +33,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	
+	// UPROPERTY(EditAnywhere)
+	// TArray<TSubclassOf<class AMonster>> MonsterFactory;
+
 	UPROPERTY(EditAnywhere)
-	TArray<TSubclassOf<class AMonster>> MonsterFactory;
+	TArray<FMonsterStruct>MonsterStructs;
 	
 	UPROPERTY(EditAnywhere)
 	TArray<TWeakObjectPtr<AMonster>> Monsters;

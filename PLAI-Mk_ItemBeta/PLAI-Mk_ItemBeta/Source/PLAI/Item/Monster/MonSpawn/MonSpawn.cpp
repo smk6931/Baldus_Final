@@ -28,7 +28,7 @@ void AMonSpawn::BeginPlay()
 		FMonsterStruct* MonsterStruct = MonsterTable->FindRow<FMonsterStruct>(RawName, "MonSpawn65");
 		if (MonsterStruct && MonsterStruct->MonsterTop == static_cast<int32>(MonSpawnType))
 		{
-			MonsterFactory.Add(MonsterStruct->MonsterFactory[0]);
+			MonsterStructs.Add(*MonsterStruct);
 		}
 	}
 }
@@ -56,11 +56,9 @@ FVector AMonSpawn::RandLocation(float X, float Y, float Z)
 
 void AMonSpawn::SpawnMonster()
 {
-	MonsterFactory.Empty();
 	Monsters.RemoveAll([](const TWeakObjectPtr<AMonster>& Monster)
-	{
-		return !Monster.IsValid();
-	});
+	{ return !Monster.IsValid(); });
+	
 	if (Monsters.Num() > 7) return;
 	
 	FHitResult Hit;
@@ -72,27 +70,13 @@ void AMonSpawn::SpawnMonster()
 	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Start,End,ECC_GameTraceChannel1,Params);
 	if (bHit)
 	{
-		TArray<FName>RawNames = MonsterTable->GetRowNames();
-		for (FName RawName : RawNames)
+		int32 RandIndex = FMath::RandRange(0,MonsterStructs.Num()-1);
+		if (AMonster* Monster = GetWorld()->SpawnActor<AMonster>(MonsterStructs[RandIndex].MonsterFactory[0],Hit.Location,FRotator(0,0,0)))
 		{
-			FMonsterStruct* MonsterStruct = MonsterTable->FindRow<FMonsterStruct>(RawName, "MonSpawn65");
-			if (MonsterStruct && MonsterStruct->MonsterTop == static_cast<int32>(MonSpawnType))
-			{
-				MonsterFactory.Add(MonsterStruct->MonsterFactory[0]);
-				int32 RandIndex = FMath::RandRange(0,MonsterFactory.Num()-1);
-
-				if (AMonster* Monster = GetWorld()->SpawnActor<AMonster>(MonsterFactory[RandIndex]))
-				{
-					Monster->MonsterStruct = *MonsterStruct;
-					Monster->SetMonsterUi();
-					Monster->SetActorLocation(Hit.Location);
-					Monsters.Add(Monster);
-				}
-			}
+			Monster->MonsterStruct = MonsterStructs[RandIndex];
+			Monster->SetMonsterUi();
+			Monsters.Add(Monster);
 		}
-		
-		
-
 		// FActorSpawnParameters SpawnParams;
 		// SpawnParams.Owner = this;
 		// SpawnParams.Instigator = GetInstigator();
@@ -137,8 +121,6 @@ void AMonSpawn::SpawnMonster()
 	// 		}
 	// 	}
 	// },1.5);
-
-	
 }
 
 
