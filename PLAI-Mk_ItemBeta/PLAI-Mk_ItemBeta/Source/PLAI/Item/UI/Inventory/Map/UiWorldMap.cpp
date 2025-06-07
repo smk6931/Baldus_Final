@@ -22,10 +22,8 @@
 
 void UUiWorldMap::NextQuestType(EQuestType Quest)
 {
-	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
-	{
-		if (!TestPlayer->IsLocallyControlled()) return;
-	}
+	if (!TestPlayer->IsLocallyControlled()) return;
+	
 	// if (QuestType != EQuestType::E_MonsterTurn)
 	// {
 	// 	QuestType = static_cast<EQuestType>(static_cast<int32>(QuestType) + 1);
@@ -91,14 +89,15 @@ void UUiWorldMap::NativeConstruct()
 	
 	GameStateOpen = Cast<AGameStateOpen>(GetWorld()->GetGameState());
 	GameStateOpen->FindMiniMapGuideIcon();
+
+	TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 	
 	MaterialMapDynamic = UMaterialInstanceDynamic::Create(MaterialMapInterface,this);
 	MiniMap->SetBrushFromMaterial(MaterialMapDynamic);
 
     SetRefreshPlayerList();
 	
-	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
-	{ TestPlayer->InputComp->OnInputMap.BindUObject(this, &UUiWorldMap::ExtendMap); }
+	TestPlayer->InputComp->OnInputMap.BindUObject(this, &UUiWorldMap::ExtendMap);
 	
 	MaterialMapDynamic->SetScalarParameterValue(TEXT("ZoomFactor"), 0.5);
 	
@@ -170,59 +169,63 @@ void UUiWorldMap::SetRefreshPlayerList()
 
 void UUiWorldMap::SetPlayerIconMinimap()
 {
-	for (int i = 0; i < TestPlayers.Num(); i++)
+	if (TestPlayer->GetActorLocation().X >= WorldMinFevtor.X || TestPlayer->GetActorLocation().X <= WorldMaxFevtor.X
+		|| TestPlayer->GetActorLocation().Y >= WorldMinFevtor.Y || TestPlayer->GetActorLocation().Y <= WorldMaxFevtor.Y)
 	{
-		if (!TestPlayers[i])
+		for (int i = 0; i < TestPlayers.Num(); i++)
 		{
-			SetRefreshPlayerList();
-			UE_LOG(LogTemp,Warning,TEXT("UiWorldMap SetRefresh하고 한번더 체크 플레이어 갯수 [%d] 없냐?"),TestPlayers.Num()) return;
-		}
-		float U = (TestPlayers[i]->GetActorLocation().X -
-			WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
-		float V = (TestPlayers[i]->GetActorLocation().Y -
-			WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
-		
-		U = FMath::Clamp(U, 0.f, 1.f);
-		V = FMath::Clamp(V, 0.f, 1.f);
-
-		FVector2D PixelPos = FVector2D(U * MiniMapSize.X, V * MiniMapSize.Y);
-		float Yaw = TestPlayers[i]->GetActorRotation().Yaw;
-	
-		if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapCanvasIcon->GetChildAt(i)->Slot))
-		{
-			if (TestPlayers[i]->InvenComp && TestPlayers[i]->InvenComp->MenuInven && TestPlayers[i]->InvenComp->MenuInven->Wbp_UiWorldMap &&
-				TestPlayers[i]->InvenComp->MenuInven->Wbp_UiWorldMap == this)
+			if (!TestPlayers[i])
 			{
-				CanvasSlot->SetPosition(FVector2d(125,125));
-				MiniMapCanvasIcon->GetChildAt(i)->SetRenderTransformAngle(Yaw - 90);
-				MaterialMapDynamic->SetVectorParameterValue(TEXT("CenterOffset"),FLinearColor(U, V, 0.f, 0.f));
+				SetRefreshPlayerList();
+				UE_LOG(LogTemp,Warning,TEXT("UiWorldMap SetRefresh하고 한번더 체크 플레이어 갯수 [%d] 없냐?"),TestPlayers.Num()) return;
 			}
+			float U = (TestPlayers[i]->GetActorLocation().X -
+				WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
+			float V = (TestPlayers[i]->GetActorLocation().Y -
+				WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
+		
+			U = FMath::Clamp(U, 0.f, 1.f);
+			V = FMath::Clamp(V, 0.f, 1.f);
+
+			FVector2D PixelPos = FVector2D(U * MiniMapSize.X, V * MiniMapSize.Y);
+			float Yaw = TestPlayers[i]->GetActorRotation().Yaw;
+	
+			if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapCanvasIcon->GetChildAt(i)->Slot))
+			{
+				if (TestPlayers[i]->InvenComp && TestPlayers[i]->InvenComp->MenuInven && TestPlayers[i]->InvenComp->MenuInven->Wbp_UiWorldMap &&
+					TestPlayers[i]->InvenComp->MenuInven->Wbp_UiWorldMap == this)
+				{
+					CanvasSlot->SetPosition(FVector2d(125,125));
+					MiniMapCanvasIcon->GetChildAt(i)->SetRenderTransformAngle(Yaw - 90);
+					MaterialMapDynamic->SetVectorParameterValue(TEXT("CenterOffset"),FLinearColor(U, V, 0.f, 0.f));
+				}
 			
-			if (bExtendMap == true)
-			{
-				CanvasSlot->SetPosition(PixelPos);
+				if (bExtendMap == true)
+				{
+					CanvasSlot->SetPosition(PixelPos);
+				}
 			}
+			else { UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::SetPlayer MinmapVector Error")); }
 		}
-		else { UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::SetPlayer MinmapVector Error")); }
-	}
 	
-	for (int i = 0; i < QuestActors.Num(); i++)
-	{
-		FVector Location = QuestActors[i]->GetActorLocation();
-		
-		float U = (Location.X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
-		float V = (Location.Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
-
-		U = FMath::Clamp(U, 0.f, 1.f);
-		V = FMath::Clamp(V, 0.f, 1.f);
-		
-		FVector2D PixelPos = FVector2D(U * MiniMapSize.X, V * MiniMapSize.Y);
-
-		if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapCanvasIconQuest->GetChildAt(i)->Slot))
+		for (int i = 0; i < QuestActors.Num(); i++)
 		{
-			if (bExtendMap == true)
+			FVector Location = QuestActors[i]->GetActorLocation();
+		
+			float U = (Location.X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
+			float V = (Location.Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
+
+			U = FMath::Clamp(U, 0.f, 1.f);
+			V = FMath::Clamp(V, 0.f, 1.f);
+		
+			FVector2D PixelPos = FVector2D(U * MiniMapSize.X, V * MiniMapSize.Y);
+
+			if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapCanvasIconQuest->GetChildAt(i)->Slot))
 			{
-				CanvasSlot->SetPosition(PixelPos);
+				if (bExtendMap == true)
+				{
+					CanvasSlot->SetPosition(PixelPos);
+				}
 			}
 		}
 	}
@@ -269,16 +272,10 @@ void UUiWorldMap::NextQuestMinimap(EQuestType Quest)
 			if (!IsValid(Icon)) return;
 			if (QuestActors[i]->QuestType == Quest)
 			{
-				if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
-				{
-					TestPlayer->QuestLocation = QuestActors[i]->GetActorLocation();
-				}
+				TestPlayer->QuestLocation = QuestActors[i]->GetActorLocation();
+				
 				Icon->SetRenderScale(FVector2D(1.2f));
 				Icon->SetRenderOpacity(1);
-
-				if (!IsValid(Icon)) return;
-
-				
 				
 				GetWorld()->GetTimerManager().SetTimer(Icon->TimerHandle,FTimerDelegate::CreateWeakLambda(this, [this,Icon]()
 				{

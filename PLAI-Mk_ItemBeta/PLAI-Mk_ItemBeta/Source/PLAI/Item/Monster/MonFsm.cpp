@@ -44,7 +44,6 @@ void UMonFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 		Attack();
 		break;
 	}
-	// ...
 }
 
 void UMonFsm::Idle()

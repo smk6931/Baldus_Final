@@ -77,6 +77,9 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	TArray<class ATestPlayer*>TestPlayers;
+
+	UPROPERTY(EditAnywhere)
+	class ATestPlayer* TestPlayer;
 	
 	void SetRefreshPlayerList();
 	
