@@ -76,7 +76,7 @@ void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 void UCreDraFsm::DraIdle(float time)
 {
 	if (!TestPlayer) return;
-	// if (CurrentTime - GetWorld()->GetDeltaSeconds() <= 0.f){} 최초한번 실행됨
+	
 	Dragon->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepRelativeTransform);
 	Dragon->SetActorLocation(TestPlayer->GetActorLocation()+FVector(0,125,125));
 	
@@ -126,7 +126,6 @@ void UCreDraFsm::DraAttackRangePre(float time)
 
 void UCreDraFsm::DraAttackRange(float time)
 {
-	int32 PatrolIndex = 0;
 	FVector Dir = PatrolPoints[0] - Dragon->GetActorLocation();
 	Dir.Normalize();
 	Dragon->AddActorWorldOffset(Dir * 100);
@@ -228,15 +227,12 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 		{
 			if (ACreBullet* Bullet = GetWorld()->SpawnActor<ACreBullet>(CreBulletFactory))
 			{
+				Bullet->CreDraFsm = this;
 				Bullet->SetActorLocation(Dragon->GetActorLocation()+Dragon->GetActorForwardVector() * 75);
 				FVector dist = Dragon->GetActorLocation() - NearMonster->GetActorLocation();
-				Bullet->ProjectileComp->Velocity = dist.GetSafeNormal() * -2000;
+				Bullet->ProjectileComp->Velocity = dist.GetSafeNormal() * -1500;
 			}
-			else
-			{
-				UE_LOG(LogTemp,Warning,TEXT("CreDraFsm Bullet 없음"))
-			}
-			AttackMonster(NearMonster);
+			// AttackMonster(NearMonster);
 			// NearMonster->MonsterStruct.CurrentHp -= Dragon->CreFsm->CreStruct.Atk;
 			// NearMonster->SetHpBar();
 			// NearMonster->DamageUi(CreatureDamage());
@@ -247,10 +243,6 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 			// 	SetCreStat();
 			// 	GetMonGold(NearMonster);
 			// }
-			UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(),
-	        NiagaraSkills[1],NearMonster->GetActorLocation(),FRotator::ZeroRotator,FVector(1.f),true, // AutoActivate                        
-	        true,// AutoDestroy
-	        ENCPoolMethod::AutoRelease); NiagaraComp->SetActive(true);
 			
 			FVector dist = NearMonster->GetActorLocation() - Dragon->GetActorLocation();
 			Dragon->SetActorRotation(dist.GetSafeNormal().Rotation());
@@ -321,18 +313,6 @@ void UCreDraFsm::DraAttackMulti(float time)
 				FinishCount++;
 				AttackMonster(Monster);
 				
-				// Monster->MonsterStruct.CurrentHp -= Dragon->CreFsm->CreStruct.Atk;
-				// Monster->SetHpBar();
-				// Monster->DamageUi(CreatureDamage());
-				//
-				// if (Monster->MonsterStruct.CurrentHp <= 0)
-				// {
-				// 	CreStruct.CurrentExp += Monster->MonsterStruct.Exp;
-				// 	Monster->Dead();
-				// 	SetCreStat();
-				// 	GetMonGold(Monster);
-				// }
-				
 				Monsters.RemoveAt(0);
 				int32 index = 0;
 				FinishCount == 2 ? index = 2 : index = 1;  
@@ -350,30 +330,6 @@ void UCreDraFsm::DraAttackMulti(float time)
 		Drastate = EDraState::DraAttackMultiPre;
 	}
 }
-
-
-
-
-void UCreDraFsm::MyTimer(TFunction<void()> func, float time)
-{
-	if (!IsValid(Dragon)) 
-	{
-		UE_LOG(LogTemp, Error, TEXT("DraAround: Dragon 포인터가 유효하지 않습니다."));
-		return;
-	}
-	bTimer = false;
-	if (func)
-	{
-		CurrentTime += GetWorld()->GetDeltaSeconds();
-		if (CurrentTime > time)
-		{
-			func(); 
-			CurrentTime = 0.0f;
-			bTimer = true;
-		}
-	}
-}
-
 
 void UCreDraFsm::NextState()
 {

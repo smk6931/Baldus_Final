@@ -31,18 +31,21 @@ void UMonFsm::BeginPlay()
 void UMonFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
-	switch (MonState)
+
+	if (Monster->HasAuthority())
 	{
-	case EMonState::Idle:
-		Idle();
-		break;
-	case EMonState::Around:
-		Around();
-		break;
-	case EMonState::Attack:
-		Attack();
-		break;
+		switch (MonState)
+		{
+		case EMonState::Idle:
+			Idle();
+			break;
+		case EMonState::Around:
+			Around();
+			break;
+		case EMonState::Attack:
+			Attack();
+			break;
+		}
 	}
 }
 
@@ -138,18 +141,6 @@ void UMonFsm::LineDestination()
 		TargetLocation = Hit.ImpactPoint;
 		// DrawDebugLine(GetWorld(),Start,TargetLocation,FColor::Red,false,2.0f);
 		// DrawDebugSphere(GetWorld(),TargetLocation,10,10,FColor::Red,false,2.0f);
-	}
-}
-
-void UMonFsm::MyTimer(TFunction<void()> Func, float time)
-{
-	bTimer = false;
-	CurrentTime += GetWorld()->GetDeltaSeconds();
-	if (CurrentTime > time)
-	{
-		Func();
-		bTimer = true;
-		CurrentTime = 0.0f;
 	}
 }
 

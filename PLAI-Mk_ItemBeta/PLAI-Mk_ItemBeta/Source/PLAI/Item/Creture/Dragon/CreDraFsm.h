@@ -79,8 +79,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	int32 FinishCount = 0;
 	
-	void MyTimer(TFunction<void()> func, float time = 2.0f);
-
 	void NextState();
 
 	UPROPERTY(EditAnywhere)

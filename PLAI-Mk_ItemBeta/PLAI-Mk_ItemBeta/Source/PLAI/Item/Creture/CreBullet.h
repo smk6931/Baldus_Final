@@ -24,9 +24,21 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
+    UPROPERTY(EditAnywhere)
+	class UCreDraFsm* CreDraFsm;
+	
 	UPROPERTY(EditAnywhere)
 	class UNiagaraComponent* NiagaraComp;
 
 	UPROPERTY(EditAnywhere)
 	class UProjectileMovementComponent* ProjectileComp;
+
+	UPROPERTY(EditAnywhere)
+	class UParticleSystemComponent* ParticleComp;
+
+	UPROPERTY(EditAnywhere)
+	class USphereComponent* SphereComp;
+
+	UFUNCTION()
+	void OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 };

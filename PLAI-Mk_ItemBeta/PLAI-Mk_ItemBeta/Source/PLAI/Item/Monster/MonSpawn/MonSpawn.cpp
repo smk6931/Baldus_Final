@@ -31,20 +31,6 @@ void AMonSpawn::Tick(float DeltaTime)
 	SpawnMonster();
 }
 
-
-void AMonSpawn::MyTimer(void(AMonSpawn::* Func)(), float Second)
-{
-	bTimer = false;
-	
-	CurrentTime += GetWorld()->GetDeltaSeconds();
-	if (CurrentTime >= Second)
-	{
-		(this->*Func)();
-		bTimer = true;
-		CurrentTime = 0.0f;
-	}
-}
-
 void AMonSpawn::MyTimer(TFunction<void()> Func, float Second)
 {
 	bTimer = false;
