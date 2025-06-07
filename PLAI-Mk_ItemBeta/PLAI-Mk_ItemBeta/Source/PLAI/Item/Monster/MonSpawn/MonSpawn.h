@@ -61,9 +61,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	UDataTable* MonsterTable;
 
-	void MyTimer(TFunction<void()> Func, float Second = 2.0f);
+	// void MyTimer(TFunction<void()> Func, float Second = 2.0f);
 	
 	FVector RandLocation(float X = 1000.0f, float Y = 1000.0f, float Z = 50.0f);
+	
 	void SpawnMonster();
 
 	// UPROPERTY(EditAnywhere)

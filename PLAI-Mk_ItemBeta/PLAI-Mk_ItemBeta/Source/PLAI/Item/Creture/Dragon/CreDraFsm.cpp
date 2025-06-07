@@ -92,14 +92,18 @@ void UCreDraFsm::DraAround(float time)
 {
 	if (!TestPlayer) return;
 	RotateTime += GetWorld()->GetDeltaSeconds();
+	
 	FRotator Rot = FRotator(0,RotateTime * 90,0);
 	Dragon->SetActorLocation(TestPlayer->GetActorLocation() + Rot.Vector() * 500
 		+FVector(0,cos(RotateTime * 3) * 200,200 + sin(RotateTime * 10) * 100));
 
-	if (GetMonsterBySphere(Creature,2500).Monsters.Num() > 0)
+	CurrentTime += GetWorld()->GetDeltaSeconds();
+	if (CurrentTime > 2.0f)
 	{
-		UE_LOG(LogTemp,Warning,TEXT("CreDreFsm 순찰중 사냥모드 진입"))
-		Drastate = EDraState::DraAttackRangePre;
+		if (GetMonsterBySphere(Creature,2500).Monsters.Num() > 0)
+		{ UE_LOG(LogTemp,Warning,TEXT("CreDreFsm 순찰중 사냥모드 진입"))
+			Drastate = EDraState::DraAttackRangePre; }
+		CurrentTime = 0;
 	}
 }
 
@@ -232,6 +236,7 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 				Bullet->SetActorLocation(Dragon->GetActorLocation()+Dragon->GetActorForwardVector() * 75);
 				FVector dist = NearMonster->GetActorLocation() - Dragon->GetActorLocation();
 				DrawDebugSphere(GetWorld(),NearMonster->GetActorLocation(),50,15,FColor::Red,false,1.0f);
+				Bullet->ProjectileComp->ProjectileGravityScale = 0.0f;
 				Bullet->ProjectileComp->Velocity = dist.GetSafeNormal() * 1500;
 			}
 			// AttackMonster(NearMonster);
@@ -241,7 +246,7 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 			// if (NearMonster->MonsterStruct.CurrentHp <= 0)
 			// {
 			// 	CreStruct.CurrentExp += NearMonster->MonsterStruct.Exp;
-			// 	NearMonster->Dead();
+				// NearMonster->Dead();
 			// 	SetCreStat();
 			// 	GetMonGold(NearMonster);
 			// }
@@ -314,7 +319,7 @@ void UCreDraFsm::DraAttackMulti(float time)
 			{
 				FinishCount++;
 				AttackMonster(Monster);
-				
+
 				Monsters.RemoveAt(0);
 				int32 index = 0;
 				FinishCount == 2 ? index = 2 : index = 1;  

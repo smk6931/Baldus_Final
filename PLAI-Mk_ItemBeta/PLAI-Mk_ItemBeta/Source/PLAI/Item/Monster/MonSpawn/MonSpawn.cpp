@@ -21,25 +21,28 @@ AMonSpawn::AMonSpawn()
 void AMonSpawn::BeginPlay()
 {
 	Super::BeginPlay();
+
+	TArray<FName>RawNames = MonsterTable->GetRowNames();
+	for (FName RawName : RawNames)
+	{
+		FMonsterStruct* MonsterStruct = MonsterTable->FindRow<FMonsterStruct>(RawName, "MonSpawn65");
+		if (MonsterStruct && MonsterStruct->MonsterTop == static_cast<int32>(MonSpawnType))
+		{
+			MonsterFactory.Add(MonsterStruct->MonsterFactory[0]);
+		}
+	}
 }
 
 // Called every frame
 void AMonSpawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
-	SpawnMonster();
-}
 
-void AMonSpawn::MyTimer(TFunction<void()> Func, float Second)
-{
-	bTimer = false;
 	CurrentTime += GetWorld()->GetDeltaSeconds();
-	if (CurrentTime >= Second)
+	if (CurrentTime >= 2)
 	{
-		bTimer = true;
-		Func();
-		CurrentTime = 0.0f;
+		SpawnMonster();
+		CurrentTime = 0;
 	}
 }
 
@@ -53,51 +56,89 @@ FVector AMonSpawn::RandLocation(float X, float Y, float Z)
 
 void AMonSpawn::SpawnMonster()
 {
-	// UWorld* World = GetWorld();
-	// if (!IsValid(World))
-	// { UE_LOG(LogTemp, Warning, TEXT("SpawnMonster: GetWorld()가 유효하지 않습니다.")); return; }
-	// int32 FactoryCount = MonsterFactory.Num();
-	// if (FactoryCount <= 0)
-	// { UE_LOG(LogTemp, Warning, TEXT("SpawnMonster: MonsterFactory가 비어 있습니다.")); return; }
-	
-	MyTimer([this]()
+	MonsterFactory.Empty();
+	Monsters.RemoveAll([](const TWeakObjectPtr<AMonster>& Monster)
 	{
-		Monsters.RemoveAll([](const TWeakObjectPtr<AMonster>& WeakM){return !WeakM.IsValid();});
-		
-		FHitResult Hit;
-		FCollisionQueryParams Params;
-		Params.AddIgnoredActor(this);
-		FVector Start = GetActorLocation() + RandLocation(1000,1000) + FVector(0, 0, 1500);
-		FVector End = Start + FVector(0,0, -10000);
-		bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start,End,ECC_Visibility,Params);
-		if (bHit)
+		return !Monster.IsValid();
+	});
+	if (Monsters.Num() > 7) return;
+	
+	FHitResult Hit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	FVector Start = GetActorLocation() + RandLocation() + FVector(0,0,1500);
+	FVector End = Start + FVector(0,0,-10000);
+	
+	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Start,End,ECC_GameTraceChannel1,Params);
+	if (bHit)
+	{
+		TArray<FName>RawNames = MonsterTable->GetRowNames();
+		for (FName RawName : RawNames)
 		{
-			if (Monsters.Num() > 6)return;
-			TArray<FName>Raws = MonsterTable->GetRowNames();
-			for (FName Raw : Raws)
+			FMonsterStruct* MonsterStruct = MonsterTable->FindRow<FMonsterStruct>(RawName, "MonSpawn65");
+			if (MonsterStruct && MonsterStruct->MonsterTop == static_cast<int32>(MonSpawnType))
 			{
-				FMonsterStruct* MonsterStruct = MonsterTable->FindRow<FMonsterStruct>(Raw,TEXT("MonSpawn"));
-				if (MonsterStruct && MonsterStruct->MonsterTop == static_cast<int32>(MonSpawnType))
+				MonsterFactory.Add(MonsterStruct->MonsterFactory[0]);
+				int32 RandIndex = FMath::RandRange(0,MonsterFactory.Num()-1);
+
+				if (AMonster* Monster = GetWorld()->SpawnActor<AMonster>(MonsterFactory[RandIndex]))
 				{
-					MonsterFactory.Add(MonsterStruct->MonsterFactory[0]);
-					int32 RandIndex = FMath::RandRange(0, Monsters.Num() - 1);
-				
-					FActorSpawnParameters SpawnParams;
-					SpawnParams.Owner = this;
-					SpawnParams.Instigator = GetInstigator();
-					SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-					
-					if (AMonsterMaster* MonsterMaster = GetWorld()->SpawnActor<AMonsterMaster>(MonsterFactory[RandIndex],
-						Hit.Location,FRotator(0,0,0),SpawnParams))
-					{
-						MonsterMaster->MonsterStruct = *MonsterStruct;
-						MonsterMaster->SetMonsterUi();
-						Monsters.Add(MonsterMaster);
-					}
+					Monster->MonsterStruct = *MonsterStruct;
+					Monster->SetMonsterUi();
+					Monster->SetActorLocation(Hit.Location);
+					Monsters.Add(Monster);
 				}
 			}
 		}
-	},1.5);
+		
+		
+
+		// FActorSpawnParameters SpawnParams;
+		// SpawnParams.Owner = this;
+		// SpawnParams.Instigator = GetInstigator();
+		// SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	}
+	
+	// MyTimer([this]()
+	// {
+	// 	Monsters.RemoveAll([](const TWeakObjectPtr<AMonster>& WeakM){return !WeakM.IsValid();});
+	// 	
+	// 	FHitResult Hit;
+	// 	FCollisionQueryParams Params;
+	// 	Params.AddIgnoredActor(this);
+	// 	FVector Start = GetActorLocation() + RandLocation(1000,1000) + FVector(0, 0, 1500);
+	// 	FVector End = Start + FVector(0,0, -10000);
+	// 	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start,End,ECC_Visibility,Params);
+	// 	if (bHit)
+	// 	{
+	// 		if (Monsters.Num() > 6)return;
+	// 		TArray<FName>Raws = MonsterTable->GetRowNames();
+	// 		for (FName Raw : Raws)
+	// 		{
+	// 			FMonsterStruct* MonsterStruct = MonsterTable->FindRow<FMonsterStruct>(Raw,TEXT("MonSpawn"));
+	// 			if (MonsterStruct && MonsterStruct->MonsterTop == static_cast<int32>(MonSpawnType))
+	// 			{
+	// 				MonsterFactory.Add(MonsterStruct->MonsterFactory[0]);
+	// 				int32 RandIndex = FMath::RandRange(0, Monsters.Num() - 1);
+	// 			
+	// 				FActorSpawnParameters SpawnParams;
+	// 				SpawnParams.Owner = this;
+	// 				SpawnParams.Instigator = GetInstigator();
+	// 				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	// 				
+	// 				if (AMonsterMaster* MonsterMaster = GetWorld()->SpawnActor<AMonsterMaster>(MonsterFactory[RandIndex],
+	// 					Hit.Location,FRotator(0,0,0),SpawnParams))
+	// 				{
+	// 					MonsterMaster->MonsterStruct = *MonsterStruct;
+	// 					MonsterMaster->SetMonsterUi();
+	// 					Monsters.Add(MonsterMaster);
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// },1.5);
+
+	
 }
 
 
@@ -129,3 +170,22 @@ void AMonSpawn::SpawnMonster()
 // WPS->OnU
 // WPS->OnActorLoaded.AddUObject(this, &AMonSpawn::MyTimer);
 // WPS->OnActorUnloaded.AddUObject(this, &AMonSpawn::HandleActorUnloaded);
+
+
+
+
+
+
+
+
+// void AMonSpawn::MyTimer(TFunction<void()> Func, float Second)
+// {
+// 	bTimer = false;
+// 	CurrentTime += GetWorld()->GetDeltaSeconds();
+// 	if (CurrentTime >= Second)
+// 	{
+// 		bTimer = true;
+// 		Func();
+// 		CurrentTime = 0.0f;
+// 	}
+// }
