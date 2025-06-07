@@ -181,7 +181,7 @@ void UCreDraFsm::DraAttackRangeFinish(float time)
 		Drastate = EDraState::DraAttackSingleRange;	CurrentTime = 0;
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),ParticlesSkills[1],
 		   LineTraceZ(Creature,Dragon->GetActorLocation()),
-		   FRotator(0,0,0),/*Scale=*/ FVector(3.f),/*bAutoDestroy=*/ true);
+		   FRotator(0,0,0),/*Scale=*/ FVector(1.5f),/*bAutoDestroy=*/ true);
 		for (AMonster* Monster : GetMonsterBySphere(Creature,800).Monsters)
 		{ AttackMonster(Monster); }
 	}
@@ -235,9 +235,9 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 				Bullet->SetActorScale3D(FVector(1.5,1.5,1.5));
 				Bullet->SetActorLocation(Dragon->GetActorLocation()+Dragon->GetActorForwardVector() * 75);
 				FVector dist = NearMonster->GetActorLocation() - Dragon->GetActorLocation();
-				DrawDebugSphere(GetWorld(),NearMonster->GetActorLocation(),50,15,FColor::Red,false,1.0f);
+				// DrawDebugSphere(GetWorld(),NearMonster->GetActorLocation(),50,15,FColor::Red,false,1.0f);
 				Bullet->ProjectileComp->ProjectileGravityScale = 0.0f;
-				Bullet->ProjectileComp->Velocity = dist.GetSafeNormal() * 1500;
+				Bullet->ProjectileComp->Velocity = dist.GetSafeNormal() * 2500;
 			}
 			// AttackMonster(NearMonster);
 			// NearMonster->MonsterStruct.CurrentHp -= Dragon->CreFsm->CreStruct.Atk;

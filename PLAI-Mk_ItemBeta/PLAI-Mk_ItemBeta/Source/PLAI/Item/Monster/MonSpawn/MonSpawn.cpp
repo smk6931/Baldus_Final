@@ -70,18 +70,25 @@ void AMonSpawn::SpawnMonster()
 	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Start,End,ECC_GameTraceChannel1,Params);
 	if (bHit)
 	{
+		UE_LOG(LogTemp,Warning,TEXT("MonSpawn 스폰위치 [%s]"),*Hit.Location.ToString());
 		int32 RandIndex = FMath::RandRange(0,MonsterStructs.Num()-1);
-		if (AMonster* Monster = GetWorld()->SpawnActor<AMonster>(MonsterStructs[RandIndex].MonsterFactory[0],Hit.Location,FRotator(0,0,0)))
+		
+		FActorSpawnParameters SpawnParams;
+        SpawnParams.Owner = this;
+		SpawnParams.Instigator = GetInstigator();
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		
+		if (AMonster* Monster = GetWorld()->SpawnActor<AMonster>(MonsterStructs[RandIndex].
+			MonsterFactory[0],Hit.Location,FRotator(0,0,0),SpawnParams))
 		{
 			Monster->MonsterStruct = MonsterStructs[RandIndex];
 			Monster->SetMonsterUi();
 			Monsters.Add(Monster);
 		}
-		// FActorSpawnParameters SpawnParams;
-		// SpawnParams.Owner = this;
-		// SpawnParams.Instigator = GetInstigator();
-		// SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	}
+
+
+
 	
 	// MyTimer([this]()
 	// {
