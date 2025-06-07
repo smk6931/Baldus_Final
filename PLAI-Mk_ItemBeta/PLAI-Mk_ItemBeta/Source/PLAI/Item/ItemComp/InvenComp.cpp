@@ -97,7 +97,8 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 
 	if (TestPlayer->IsLocallyControlled() && ItemDataTable && PC->WasInputKeyJustPressed(EKeys::Seven))
 	{
-		MenuInven->Wbp_UiQuest->NextQuest(0,FString("Chapter1"),FString("QuesContentt"));
+		Server_SpawnCreature();
+		// MenuInven->Wbp_UiQuest->NextQuest(0,FString("Chapter1"),FString("QuesContentt"));
 	}
 
 	

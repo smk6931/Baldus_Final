@@ -65,8 +65,14 @@ void ACreBullet::OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, A
 			true,// AutoDestroy
 			ENCPoolMethod::AutoRelease);
 			NiagaraComponent->SetActive(true);
+			Destroy();
 		}
 	}
-	Destroy();
+	else
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
+		{ Destroy(); },3.0f, false);
+	}
 }
 

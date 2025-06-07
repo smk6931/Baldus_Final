@@ -67,7 +67,7 @@ void AMonSpawn::SpawnMonster()
 		FHitResult Hit;
 		FCollisionQueryParams Params;
 		Params.AddIgnoredActor(this);
-		FVector Start = GetActorLocation() + RandLocation(500,500) + FVector(0, 0, 1500);
+		FVector Start = GetActorLocation() + RandLocation(1000,1000) + FVector(0, 0, 1500);
 		FVector End = Start + FVector(0,0, -10000);
 		bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start,End,ECC_Visibility,Params);
 		if (bHit)
@@ -77,7 +77,6 @@ void AMonSpawn::SpawnMonster()
 			for (FName Raw : Raws)
 			{
 				FMonsterStruct* MonsterStruct = MonsterTable->FindRow<FMonsterStruct>(Raw,TEXT("MonSpawn"));
-				int32 index = static_cast<int32>(MonSpawnType);
 				if (MonsterStruct && MonsterStruct->MonsterTop == static_cast<int32>(MonSpawnType))
 				{
 					MonsterFactory.Add(MonsterStruct->MonsterFactory[0]);
