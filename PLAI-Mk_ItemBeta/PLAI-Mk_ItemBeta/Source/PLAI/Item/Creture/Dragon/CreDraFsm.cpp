@@ -110,22 +110,31 @@ void UCreDraFsm::DraAround(float time)
 void UCreDraFsm::DraAttackRangePre(float time)
 {
 	PatrolPoints.Empty();
-	FVector Loc = TestPlayer->GetActorLocation();
-	for (int32 i = 0; i < 10; i++)
+
+	Monsters = GetMonsterBySphere(Dragon->GetActorLocation(),2500).Monsters;
+    if (Monsters.Num() > 0)
+    {
+    	FVector Loc = Monsters[0]->GetActorLocation();
+    	for (int32 i = 0; i < 10; i++)
+    	{
+    		float x = FMath::RandRange(-750,750);
+    		float y = FMath::RandRange(-750,750);   
+    		float z = FMath::RandRange(0,500);
+    		PatrolPoints.Add(Loc + FVector(x,y,z));
+    		// if (i == 0)
+    		// { DrawDebugSphere(GetWorld(),PatrolPoints[i],75,20,FColor::Black,false,10); }
+    		// else
+    		// { DrawDebugSphere(GetWorld(),PatrolPoints[i],50,10,FColor::Red,false,10); }
+    	}
+    	FVector dir = PatrolPoints[0] - Dragon->GetActorLocation();
+    	dir.Normalize();
+    	Dragon->SetActorRotation(dir.Rotation());
+    	Drastate = EDraState::DraAttackRange;
+    }
+	else
 	{
-		float x = FMath::RandRange(-750,750);
-		float y = FMath::RandRange(-750,750);   
-		float z = FMath::RandRange(0,500);
-		PatrolPoints.Add(Loc + FVector(x,y,z));
-		// if (i == 0)
-		// { DrawDebugSphere(GetWorld(),PatrolPoints[i],75,20,FColor::Black,false,10); }
-		// else
-		// { DrawDebugSphere(GetWorld(),PatrolPoints[i],50,10,FColor::Red,false,10); }
+		Drastate = EDraState::DraAround;
 	}
-	FVector dir = PatrolPoints[0] - Dragon->GetActorLocation();
-	dir.Normalize();
-	Dragon->SetActorRotation(dir.Rotation());
-	Drastate = EDraState::DraAttackRange;
 }
 
 void UCreDraFsm::DraAttackRange(float time)
@@ -221,47 +230,9 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 		Bullet->SetActorLocation(Dragon->GetActorLocation() + Dragon->GetActorForwardVector() * 75);
 		Bullet->ProjectileComp->ProjectileGravityScale = 0.0f;
 		Bullet->ProjectileComp->Velocity = (NearMonster->GetActorLocation() - Dragon->GetActorLocation()).GetSafeNormal() * 2500;
+		Bullet->CreDraFsm = this;
 		Dragon->SetActorRotation((NearMonster->GetActorLocation() - Dragon->GetActorLocation()).GetSafeNormal().Rotation());
 	}
-	
-	// TArray<FOverlapResult>Results;
-	// FCollisionQueryParams Params;
-	// Params.AddIgnoredActor(Dragon);
-	//
-	// bool bHit = GetWorld()->OverlapMultiByChannel(Results,Dragon->GetActorLocation(),
-	// 	FQuat::Identity,ECC_Pawn,FCollisionShape::MakeSphere(Radios),Params);
-	// if (bHit)
-	// {
-	// 	float Distance = 10000.0f;
-	// 	for (FOverlapResult Result: Results)
-	// 	{
-	// 		AMonster* Monster = Cast<AMonster>(Result.GetActor());
-	// 		if (Monster)
-	// 		{
-	// 			float CurDist = FVector::Distance(Dragon->GetActorLocation(),Result.GetActor()->GetActorLocation());
-	// 			if (CurDist < Distance)
-	// 			{
-	// 				Distance = CurDist;
-	// 				NearMonster = Monster;
-	// 			}
-	// 		}
-	// 	}
-	// 	if (NearMonster)
-	// 	{
-	// 		if (ACreBullet* Bullet = GetWorld()->SpawnActor<ACreBullet>(CreBulletFactory))
-	// 		{
-	// 			Bullet->CreDraFsm = this;
-	// 			Bullet->SetActorScale3D(FVector(1.5,1.5,1.5));
-	// 			Bullet->SetActorLocation(Dragon->GetActorLocation()+Dragon->GetActorForwardVector() * 75);
-	// 			FVector dist = NearMonster->GetActorLocation() - Dragon->GetActorLocation();
-	// 			// DrawDebugSphere(GetWorld(),NearMonster->GetActorLocation(),50,15,FColor::Red,false,1.0f);
-	// 			Bullet->ProjectileComp->ProjectileGravityScale = 0.0f;
-	// 			Bullet->ProjectileComp->Velocity = dist.GetSafeNormal() * 2500;
-	// 		}
-	// 		FVector dist = NearMonster->GetActorLocation() - Dragon->GetActorLocation();
-	// 		Dragon->SetActorRotation(dist.GetSafeNormal().Rotation());
-	// 	}
-	// }
 }
 
 void UCreDraFsm::DraAttackMultiPre(float time, float Radius)

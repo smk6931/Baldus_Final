@@ -46,17 +46,19 @@ void UCreFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 
 void UCreFsm::AttackMonster(AMonster* Monster)
 {
-	if (!IsValid(Monster)) return;;
-
 	bool Critical = false;
 	int Damage = 0;
 	if (CreStruct.Crit > FMath::FRandRange(0.0f,100.0f))
 	{ Damage = CreStruct.Atk + CreStruct.Atk*CreStruct.CritDmg/100; Critical = true; }
 	else { Damage = CreStruct.Atk; }
     Damage = FMath::FRandRange(Damage * 0.9,Damage * 1.1);
-	
-	Monster->MonsterStruct.CurrentHp -= Damage;
-	Monster->SetHpBar();
+	if (IsValid(Monster))
+	{
+		Monster->MonsterStruct.CurrentHp -= Damage;
+		Monster->SetHpBar();
+	}
+	else
+	{ UE_LOG(LogTemp,Warning,TEXT("CreFsm AttackMonster Monster Isvalid가 없음")) }
 
 	// 몬스터 데미지주기 과연될까?
 	Creature->MonDamage = CreateWidget<UMonDamage>(GetWorld(),Creature->CreatureParent->MonDamageFactory);
