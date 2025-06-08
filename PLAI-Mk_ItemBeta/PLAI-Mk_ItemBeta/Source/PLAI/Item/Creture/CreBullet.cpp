@@ -58,13 +58,17 @@ void ACreBullet::OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, A
 	if (AMonster* Monster = Cast<AMonster>(OtherActor))
 	{
 		UE_LOG(LogTemp,Warning,TEXT("CreBullet 몬스터가 맞았음"))
-		CreDraFsm->AttackMonster(Monster);
-		UNiagaraComponent* NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(),
-		CreDraFsm->NiagaraSkills[1],Monster->GetActorLocation(),FRotator::ZeroRotator,FVector(2.f),true, // AutoActivate                        
-		true,// AutoDestroy
-		ENCPoolMethod::AutoRelease);
-		NiagaraComponent->SetActive(true);
+		if (IsValid(CreDraFsm))
+		{
+			CreDraFsm->AttackMonster(Monster);
+			UNiagaraComponent* NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(),
+			CreDraFsm->NiagaraSkills[1],Monster->GetActorLocation(),FRotator::ZeroRotator,FVector(2.f),true, // AutoActivate                        
+			true,// AutoDestroy
+			ENCPoolMethod::AutoRelease);
+			NiagaraComponent->SetActive(true);
+		}
 		Destroy();
 	}
 }
+
 
