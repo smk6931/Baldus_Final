@@ -189,9 +189,6 @@ void UCreDraFsm::DraAttackRangeFinish(float time)
 
 void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 {
-	if (PlayerDistance() > 2800 || GetMonsterBySphere(Creature,2800).Monsters.Num() == 0)
-	{ Drastate = EDraState::DraIdle; }
-	
 	Dragon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
     CurrentTime += GetWorld()->GetDeltaSeconds();
 	if (CurrentTime > time)
@@ -202,7 +199,9 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 	AMonster* NearMonster = nullptr;
 	
 	TimeFire += GetWorld()->GetDeltaSeconds();
-	if (TimeFire < 1) return;
+	if (TimeFire < 1)
+	{ if (PlayerDistance() > 2800 || GetMonsterBySphere(Creature,2800).Monsters.Num() == 0)
+		{ Drastate = EDraState::DraIdle; } return; }
 	TimeFire = 0.0f;
 	
 	TArray<FOverlapResult>Results;
@@ -259,12 +258,14 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 
 void UCreDraFsm::DraAttackMultiPre(float time, float Radius)
 {
-	if (PlayerDistance() > 2500 || GetMonsterBySphere(Creature,2500).Monsters.Num() == 0)
-	{ Drastate = EDraState::DraIdle; }
-	
 	// UE_LOG(LogTemp,Warning,TEXT("CreDraFsm 멀티공격준비 초시계%f"),CurrentTime)
 	CurrentTime += GetWorld()->GetDeltaSeconds();
-	if (CurrentTime < time)return;
+	if (CurrentTime < time)
+	{
+		if (PlayerDistance() > 2500 || GetMonsterBySphere(Creature,2500).Monsters.Num() == 0)
+		{ Drastate = EDraState::DraIdle; }
+		return;
+	}
 	CurrentTime = 0; // 밑에거 한번만 실행됨
 
 	Monsters.Empty();
