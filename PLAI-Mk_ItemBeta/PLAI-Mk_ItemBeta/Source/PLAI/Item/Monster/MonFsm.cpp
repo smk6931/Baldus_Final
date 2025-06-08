@@ -80,13 +80,14 @@ FVector UMonFsm::RandLocation(float X, float Y, float Z)
 	return FVector(x,y,z);
 }
 
+// DrawDebugLine(GetWorld(),Monster->GetActorLocation(),TargetLocation,FColor::Blue,false,0.02f);
+//    DrawDebugSphere(GetWorld(),TargetLocation,20,30,FColor::Blue,false,0.02f);
+
 void UMonFsm::MoveDestination()
 {
-	// DrawDebugLine(GetWorld(),Monster->GetActorLocation(),TargetLocation,FColor::Blue,false,0.02f);
-    // DrawDebugSphere(GetWorld(),TargetLocation,20,30,FColor::Blue,false,0.02f);
-	// Monster->SetActorRotation(Distance.GetSafeNormal().Rotation());
-
 	FVector Distance = TargetLocation - Monster->GetActorLocation();
+	
+	Monster->SetActorRotation(Distance.GetSafeNormal().Rotation());
 	Monster->AddActorWorldOffset(Distance.GetSafeNormal() * 10,false);
 
 	if (Distance.Length() < 75)
@@ -102,7 +103,6 @@ void UMonFsm::MoveDestination()
 	}
 	if (bRotator == true)
 	{
-		// UE_LOG(LogTemp,Warning,TEXT("MonFsm 초시계 %f"),CurrentTime)
 		CurrentTime += GetWorld()->DeltaTimeSeconds;
 		FRotator Rotator = UKismetMathLibrary::RLerp(Monster->GetActorRotation(), Distance.GetSafeNormal().Rotation(),
 		CurrentTime, false);
@@ -114,16 +114,16 @@ void UMonFsm::MoveDestination()
 		}
 	}
 	
-	FHitResult Hit;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(Monster);
-	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Monster->GetActorLocation() + FVector(0,0,300),
-		Monster->GetActorLocation() + FVector(0,0,-300),ECC_Visibility,Params);
-	if(bHit)
-	{
-		FRotator Rotator = UKismetMathLibrary::MakeRotFromYZ(Monster->GetActorRightVector(),Hit.ImpactNormal);
-		Monster->SetActorRotation(Rotator);
-	}
+	// FHitResult Hit;
+	// FCollisionQueryParams Params;
+	// Params.AddIgnoredActor(Monster);
+	// bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Monster->GetActorLocation() + FVector(0,0,300),
+	// 	Monster->GetActorLocation() + FVector(0,0,-300),ECC_GameTraceChannel1,Params);
+	// if(bHit)
+	// {
+	// 	FRotator Rotator = UKismetMathLibrary::MakeRotFromYZ(Monster->GetActorRightVector(),Hit.ImpactNormal);
+	// 	Monster->SetActorRotation(Rotator);
+	// }
 }
 
 void UMonFsm::LineDestination()
@@ -135,13 +135,17 @@ void UMonFsm::LineDestination()
 	FVector Start = Monster->GetActorLocation() + RandLocation(RandLocationFloat,RandLocationFloat) + FVector(0,0,2000);
 	FVector End = Start + FVector(0,0, -10000);
 	
-	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Start,End,ECC_Visibility,Params);
+	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Start,End,ECC_GameTraceChannel1,Params);
 	if(bHit)
 	{
 		TargetLocation = Hit.ImpactPoint;
-		// DrawDebugLine(GetWorld(),Start,TargetLocation,FColor::Red,false,2.0f);
-		// DrawDebugSphere(GetWorld(),TargetLocation,10,10,FColor::Red,false,2.0f);
 	}
 }
+
+// DrawDebugLine(GetWorld(),Start,TargetLocation,FColor::Red,false,2.0f);
+// DrawDebugSphere(GetWorld(),TargetLocation,10,10,FColor::Red,false,2.0f);
+
+
+// UE_LOG(LogTemp,Warning,TEXT("MonFsm 초시계 %f"),CurrentTime)
 
 

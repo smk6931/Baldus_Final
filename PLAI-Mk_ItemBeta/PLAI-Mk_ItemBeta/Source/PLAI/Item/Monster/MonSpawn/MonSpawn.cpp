@@ -70,7 +70,6 @@ void AMonSpawn::SpawnMonster()
 	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Start,End,ECC_GameTraceChannel1,Params);
 	if (bHit)
 	{
-		UE_LOG(LogTemp,Warning,TEXT("MonSpawn 스폰위치 [%s]"),*Hit.Location.ToString());
 		int32 RandIndex = FMath::RandRange(0,MonsterStructs.Num()-1);
 		
 		FActorSpawnParameters SpawnParams;

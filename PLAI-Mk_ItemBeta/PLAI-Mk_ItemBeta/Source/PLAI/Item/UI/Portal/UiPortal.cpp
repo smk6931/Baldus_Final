@@ -28,7 +28,7 @@ void UUiPortal::WarpTestPlayer(EMonSpawnType SpawnType)
 {
 	TArray<AActor*> Mons;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMonster::StaticClass(), Mons);
-
+	
 	for (AActor* Mon : Mons)
 	{
 		if (AMonster* Monster = Cast<AMonster>(Mon))
@@ -38,11 +38,10 @@ void UUiPortal::WarpTestPlayer(EMonSpawnType SpawnType)
 		}
 	}
 	
-	UE_LOG(LogTemp,Warning,TEXT("UiPortal 어디소환중? [%s]"),*UEnum::GetValueAsString(SpawnType))
 	
 	TArray<AActor*> Actors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AWarp::StaticClass(), Actors);
-	
+
 	if (Actors.Num() == 0){UE_LOG(LogTemp,Warning,TEXT("UiPortal 없냐? %d"),Actors.Num())return;}
 	
 	for (AActor* Actor : Actors)
@@ -57,7 +56,7 @@ void UUiPortal::WarpTestPlayer(EMonSpawnType SpawnType)
 	}
 }
 
-void UUiPortal::WarpCotnroller(EMonSpawnType SpawnType)
+void UUiPortal::WarpController(EMonSpawnType SpawnType)
 {
 	if (APlayerController* PcController = GetWorld()->GetFirstPlayerController())
 	{
@@ -70,26 +69,19 @@ void UUiPortal::WarpCotnroller(EMonSpawnType SpawnType)
 
 void UUiPortal::OnButton_Village()
 {
-	WarpCotnroller(EMonSpawnType::Village);
-	// WarpTestPlayer(EMonSpawnType::Village);
+	WarpController(EMonSpawnType::Village);
 }
-
 void UUiPortal::OnButton_Mountain()
 {
-	WarpCotnroller(EMonSpawnType::Mountain);
-	// WarpTestPlayer(EMonSpawnType::Mountain);
+	WarpController(EMonSpawnType::Mountain);
 }
-
 void UUiPortal::OnButton_Dessert()
 {
-	WarpCotnroller(EMonSpawnType::Desert);
-	// WarpTestPlayer(EMonSpawnType::Desert);
+	WarpController(EMonSpawnType::Desert);
 }
-
 void UUiPortal::OnButton_Cave()
 {
-	WarpCotnroller(EMonSpawnType::Dungeon);
-	// WarpTestPlayer(EMonSpawnType::Dungeon);
+	WarpController(EMonSpawnType::Dungeon);
 }
 
 void UUiPortal::OnButton_OpenMap()
@@ -106,6 +98,7 @@ void UUiPortal::OnButton_OpenMap()
 	}
 }
 
+// UE_LOG(LogTemp,Warning,TEXT("UiPortal 어디소환중? [%s]"),*UEnum::GetValueAsString(SpawnType))
 
 
 // Warp->SetOwner(TestPlayer);

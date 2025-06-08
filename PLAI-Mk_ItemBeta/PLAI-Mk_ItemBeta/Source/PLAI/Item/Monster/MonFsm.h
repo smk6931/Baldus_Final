@@ -70,6 +70,4 @@ public:
 
 	bool bTimer = false;
 	bool bRotator =false;
-
-	void MyTimer(TFunction<void()> Func, float time = 2.0f);
 };

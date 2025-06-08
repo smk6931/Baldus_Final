@@ -32,7 +32,7 @@ void AMonWolf::BeginPlay()
 void AMonWolf::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	SetGravity();
+	// SetGravity();
 }
 
 // Called to bind functionality to input
@@ -55,12 +55,10 @@ void AMonWolf::SetGravity()
 		FCollisionQueryParams Params;
 		Params.AddIgnoredActor(this);
 		
-		bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Start,End,ECC_Visibility,Params);
+		bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Start,End,ECC_GameTraceChannel1,Params);
 		if (bHit)
 		{
-			// DrawDebugLine(GetWorld(), Start,Hit.ImpactPoint, FColor::Blue, false, 0.02f);
 			DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 15, 10, FColor::Green, false,0.02f);
-
 			FVector Distance = Hit.ImpactPoint - GetMesh()->GetSocketLocation(SocketName);
 			if (Distance.Length() > 25.0f)
 			{
