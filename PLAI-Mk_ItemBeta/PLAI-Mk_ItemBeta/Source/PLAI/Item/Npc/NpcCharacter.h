@@ -8,6 +8,14 @@
 #include "PLAI/Item/UI/Npc/UiNpc.h"
 #include "NpcCharacter.generated.h"
 
+USTRUCT()
+struct FQuestStruct
+{
+	GENERATED_BODY()
+	
+public:
+	
+};
 
 class AQuestOrderActor;
 class ATestPlayer;
