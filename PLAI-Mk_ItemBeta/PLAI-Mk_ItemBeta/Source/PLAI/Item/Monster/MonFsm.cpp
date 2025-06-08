@@ -86,8 +86,6 @@ FVector UMonFsm::RandLocation(float X, float Y, float Z)
 void UMonFsm::MoveDestination()
 {
 	FVector Distance = TargetLocation - Monster->GetActorLocation();
-	
-	Monster->SetActorRotation(Distance.GetSafeNormal().Rotation());
 	Monster->AddActorWorldOffset(Distance.GetSafeNormal() * 10,false);
 
 	if (Distance.Length() < 75)
@@ -114,16 +112,16 @@ void UMonFsm::MoveDestination()
 		}
 	}
 	
-	// FHitResult Hit;
-	// FCollisionQueryParams Params;
-	// Params.AddIgnoredActor(Monster);
-	// bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Monster->GetActorLocation() + FVector(0,0,300),
-	// 	Monster->GetActorLocation() + FVector(0,0,-300),ECC_GameTraceChannel1,Params);
-	// if(bHit)
-	// {
-	// 	FRotator Rotator = UKismetMathLibrary::MakeRotFromYZ(Monster->GetActorRightVector(),Hit.ImpactNormal);
-	// 	Monster->SetActorRotation(Rotator);
-	// }
+	FHitResult Hit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(Monster);
+	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Monster->GetActorLocation() + FVector(0,0,300),
+		Monster->GetActorLocation() + FVector(0,0,-300),ECC_GameTraceChannel1,Params);
+	if(bHit)
+	{
+		FRotator Rotator = UKismetMathLibrary::MakeRotFromYZ(Monster->GetActorRightVector(),Hit.ImpactNormal);
+		Monster->SetActorRotation(Rotator);
+	}
 }
 
 void UMonFsm::LineDestination()
