@@ -24,6 +24,15 @@ public:
 	TArray<AMonster*>Monsters;
 };
 
+USTRUCT()
+struct FVectors
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere)
+	TArray<FVector>Vectors;
+};
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 
 class PLAI_API UCreFsm : public UActorComponent
@@ -63,7 +72,8 @@ public:
 	void GetMonGold(AMonster* Monster);
 	float PlayerDistance();
 	
-	FMonsters GetMonsterBySphere(AActor* Actor, float Radios = 2500.0f);
+	FMonsters GetMonsterBySphere(FVector Vector, float Radios = 2500.0f);
+	
 	FVector LineTraceZ(AActor* Actor,FVector Vector);
 	float CreatureDamage();
 };

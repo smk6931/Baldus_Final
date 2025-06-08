@@ -119,7 +119,7 @@ float UCreFsm::PlayerDistance()
 	return FVector::Distance(TestPlayer->GetActorLocation(),Creature->GetActorLocation());
 }
 
-FMonsters UCreFsm::GetMonsterBySphere(AActor* Actor,float Radios)
+FMonsters UCreFsm::GetMonsterBySphere(FVector Vector,float Radios)
 {
 	FMonsters Monsters;
 	TArray<FOverlapResult>Hits;
@@ -127,7 +127,7 @@ FMonsters UCreFsm::GetMonsterBySphere(AActor* Actor,float Radios)
 	Params.AddIgnoredActor(Creature);
 	Params.AddIgnoredActor(TestPlayer);
 
-	bool bHit = GetWorld()->OverlapMultiByChannel(Hits,Actor->GetActorLocation(),FQuat::Identity,
+	bool bHit = GetWorld()->OverlapMultiByChannel(Hits,Vector,FQuat::Identity,
 		ECC_Visibility,FCollisionShape::MakeSphere(Radios),Params);
 
 	if(bHit)

@@ -100,7 +100,7 @@ void UCreDraFsm::DraAround(float time)
 	CurrentTime += GetWorld()->GetDeltaSeconds();
 	if (CurrentTime > 2.0f)
 	{
-		if (GetMonsterBySphere(Creature,2500).Monsters.Num() > 0)
+		if (GetMonsterBySphere(Creature->GetActorLocation(),2500).Monsters.Num() > 0)
 		{ UE_LOG(LogTemp,Warning,TEXT("CreDreFsm 순찰중 사냥모드 진입"))
 			Drastate = EDraState::DraAttackRangePre; }
 		CurrentTime = 0;
@@ -145,7 +145,7 @@ void UCreDraFsm::DraAttackRange(float time)
 		   LineTraceZ(Creature,Dragon->GetActorLocation()),
 		   FRotator(0,0,0),/*Scale=*/ FVector(1.f),/*bAutoDestroy=*/ true);
 		
-		for (AMonster* Monster : GetMonsterBySphere(Creature,300).Monsters)
+		for (AMonster* Monster : GetMonsterBySphere(Creature->GetActorLocation(),300).Monsters)
 		{
 			// UE_LOG(LogTemp,Warning,TEXT())
 			AttackMonster(Monster);
@@ -166,7 +166,7 @@ void UCreDraFsm::DraAttackRange(float time)
 	}
 	CurrentTime += GetWorld()->GetDeltaSeconds();
 	if (CurrentTime < time) return;
-	if (GetMonsterBySphere(Creature,2000).Monsters.Num() == 0) { Drastate = EDraState::DraIdle;}
+	if (GetMonsterBySphere(Creature->GetActorLocation(),2000).Monsters.Num() == 0) { Drastate = EDraState::DraIdle;}
 	CurrentTime = 0;
 }
 
@@ -182,7 +182,7 @@ void UCreDraFsm::DraAttackRangeFinish(float time)
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),ParticlesSkills[1],
 		   LineTraceZ(Creature,Dragon->GetActorLocation()),
 		   FRotator(0,0,0),/*Scale=*/ FVector(1.5f),/*bAutoDestroy=*/ true);
-		for (AMonster* Monster : GetMonsterBySphere(Creature,800).Monsters)
+		for (AMonster* Monster : GetMonsterBySphere(Creature->GetActorLocation(),800).Monsters)
 		{ AttackMonster(Monster); }
 	}
 }
@@ -200,7 +200,7 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 	
 	TimeFire += GetWorld()->GetDeltaSeconds();
 	if (TimeFire < 1)
-	{ if (PlayerDistance() > 2800 || GetMonsterBySphere(Creature,2800).Monsters.Num() == 0)
+	{ if (PlayerDistance() > 2800 || GetMonsterBySphere(Creature->GetActorLocation(),2800).Monsters.Num() == 0)
 		{ Drastate = EDraState::DraIdle; } return; }
 	TimeFire = 0.0f;
 	
@@ -261,36 +261,44 @@ void UCreDraFsm::DraAttackMultiPre(float time, float Radius)
 	// UE_LOG(LogTemp,Warning,TEXT("CreDraFsm 멀티공격준비 초시계%f"),CurrentTime)
 	CurrentTime += GetWorld()->GetDeltaSeconds();
 	if (CurrentTime < time)
-	{
-		if (PlayerDistance() > 2500 || GetMonsterBySphere(Creature,2500).Monsters.Num() == 0)
-		{ Drastate = EDraState::DraIdle; }
-		return;
-	}
+	{ return; }
 	CurrentTime = 0; // 밑에거 한번만 실행됨
-
-	Monsters.Empty();
-	//Remove 해줘야할듯
-	TArray<FOverlapResult>HitResults;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(Dragon); 
-	bool bHit = GetWorld()->OverlapMultiByChannel(HitResults,Dragon->GetActorLocation(),
-		FQuat::Identity,ECC_Pawn,FCollisionShape::MakeSphere(Radius),Params);
-	if (bHit)
+	
+	if (PlayerDistance() > 2500 || GetMonsterBySphere(Creature->GetActorLocation(),2500).Monsters.Num() == 0)
+	{ Drastate = EDraState::DraIdle; }
+	else
 	{
-		for (FOverlapResult Result : HitResults)
+		Monsters.Empty();
+		for (AMonster* Monster : GetMonsterBySphere(Dragon->GetActorLocation(), Radius).Monsters)
 		{
-			if (AMonster* Monster = Cast<AMonster>(Result.GetActor()))
+			if (!Monsters.Contains(Monster))
 			{
-				if (!Monsters.Contains(Monster))
-				{
-					Monsters.Add(Monster);
-					// UE_LOG(LogTemp,Warning,TEXT("CraDraFsm 몬스터 몇마리씩 담기노 %d 네임 %s"),Monsters.Num(),*Monster->GetName())
-				}
+				UE_LOG(LogTemp,Warning,TEXT("CreDraFsm DraAttackMulti 몬스터 포함시킴"))
+				Monsters.Add(Monster);
 			}
 		}
+		Dragon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		Drastate = EDraState::DraAttackMulti;
 	}
-	Dragon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-	Drastate = EDraState::DraAttackMulti;
+	// TArray<FOverlapResult>HitResults;
+	// FCollisionQueryParams Params;
+	// Params.AddIgnoredActor(Dragon); 
+	// bool bHit = GetWorld()->OverlapMultiByChannel(HitResults,Dragon->GetActorLocation(),
+	// 	FQuat::Identity,ECC_Pawn,FCollisionShape::MakeSphere(Radius),Params);
+	// if (bHit)
+	// {
+	// 	for (FOverlapResult Result : HitResults)
+	// 	{
+	// 		if (AMonster* Monster = Cast<AMonster>(Result.GetActor()))
+	// 		{
+	// 			if (!Monsters.Contains(Monster))
+	// 			{
+	// 				Monsters.Add(Monster);
+	// 				UE_LOG(LogTemp,Warning,TEXT("CraDraFsm 몬스터 몇마리씩 담기노 %d 네임 %s"),Monsters.Num(),*Monster->GetName())
+	// 			}
+	// 		}
+	// 	}
+	// }
 }
 
 void UCreDraFsm::DraAttackMulti(float time)
