@@ -66,11 +66,5 @@ void ACreBullet::OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, A
 		NiagaraComponent->SetActive(true);
 		Destroy();
 	}
-	else
-	{
-		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
-		{ Destroy(); },10.0f, false);
-	}
 }
 

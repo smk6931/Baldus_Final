@@ -39,9 +39,6 @@ void ATurnTile::Tick(float DeltaTime)
 	CurrentTime += GetWorld()->GetDeltaSeconds();
 	if (CurrentTime > 2)
 	{
-		// GetTileCorner();
-		// MonsterSpawn();
-		// PlayerSpawn();
 		CurrentTime = 0;
 	}
 }
