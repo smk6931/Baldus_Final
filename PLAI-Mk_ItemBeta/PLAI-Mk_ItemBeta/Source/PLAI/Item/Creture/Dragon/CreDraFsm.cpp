@@ -230,6 +230,11 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 		Bullet->SetActorLocation(Dragon->GetActorLocation() + Dragon->GetActorForwardVector() * 75);
 		Bullet->ProjectileComp->ProjectileGravityScale = 0.0f;
 		Bullet->ProjectileComp->Velocity = (NearMonster->GetActorLocation() - Dragon->GetActorLocation()).GetSafeNormal() * 2500;
+		
+		Bullet->ProjectileComp->bIsHomingProjectile = true;
+		Bullet->ProjectileComp->HomingTargetComponent = NearMonster->GetRootComponent();
+		Bullet->ProjectileComp->HomingAccelerationMagnitude = 10000.0f; // 유도 민감도 클수록 빠르게 회전
+		
 		Bullet->CreDraFsm = this;
 		Dragon->SetActorRotation((NearMonster->GetActorLocation() - Dragon->GetActorLocation()).GetSafeNormal().Rotation());
 	}

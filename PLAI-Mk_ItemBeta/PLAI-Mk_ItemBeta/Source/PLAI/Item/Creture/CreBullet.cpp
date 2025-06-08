@@ -70,7 +70,7 @@ void ACreBullet::OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, A
 	{
 		FTimerHandle TimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
-		{ Destroy(); },3.0f, false);
+		{ Destroy(); },10.0f, false);
 	}
 }
 
