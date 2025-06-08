@@ -28,7 +28,6 @@ APLAIPlayerController::APLAIPlayerController()
 {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Default;
-	
 }
 
 void APLAIPlayerController::BeginPlay()
@@ -110,20 +109,18 @@ void APLAIPlayerController::SetupInputComponent()
 	// Add Input Mapping Context
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
-		Subsystem->AddMappingContext(DefaultMappingContext,1);
+		// Subsystem->AddMappingContext(DefaultMappingContext,1);
 		Subsystem->AddMappingContext(InputMappingContext,0);
 	}
 
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
 	{
-		// Setup mouse input events
 		EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Started, this, &APLAIPlayerController::OnInputStarted);
 		EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Triggered, this, &APLAIPlayerController::OnSetDestinationTriggered);
 		EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Completed, this, &APLAIPlayerController::OnSetDestinationReleased);
 		EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Canceled, this, &APLAIPlayerController::OnSetDestinationReleased);
-
-		// Setup touch input events
+		
 		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Started, this, &APLAIPlayerController::OnInputStarted);
 		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Triggered, this, &APLAIPlayerController::OnTouchTriggered);
 		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Completed, this, &APLAIPlayerController::OnTouchReleased);
@@ -137,12 +134,12 @@ void APLAIPlayerController::SetupInputComponent()
 
 void APLAIPlayerController::OnInputStarted()
 {
-	StopMovement();
-	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
-	{
-		TestPlayer->InputComp->SetMappingContext();
-		TestPlayer->InputComp->BindInputActions();
-	}
+	// StopMovement();
+	// if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
+	// {
+	// 	TestPlayer->InputComp->SetMappingContext();
+	// 	TestPlayer->InputComp->BindInputActions();
+	// }
 }
 
 // Triggered every frame when the input is held down

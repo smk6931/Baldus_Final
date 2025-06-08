@@ -149,6 +149,8 @@ void UUiWorldMap::SetRefreshPlayerList()
 		if (AQuestOrderActor* QuestActor = Cast<AQuestOrderActor>(Actors[i]))
 		{
 			QuestActors.Add(QuestActor);
+			DrawDebugSphere(GetWorld(),QuestActors[i]->GetActorLocation(),20,50,FColor::Blue,false,10);
+			UE_LOG(LogTemp,Warning,TEXT("UiWorldMap 퀘스트 엑터 찾기 [%s]"),*UEnum::GetValueAsString(QuestActor->QuestType))
 		}
 	}
 
