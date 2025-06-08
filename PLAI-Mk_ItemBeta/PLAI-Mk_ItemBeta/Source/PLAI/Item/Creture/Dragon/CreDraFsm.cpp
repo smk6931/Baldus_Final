@@ -196,69 +196,76 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 		Drastate = EDraState::DraAttackMultiPre;
 		CurrentTime = 0;
 	}
-	AMonster* NearMonster = nullptr;
 	
 	TimeFire += GetWorld()->GetDeltaSeconds();
-	if (TimeFire < 1)
-	{ if (PlayerDistance() > 2800 || GetMonsterBySphere(Creature->GetActorLocation(),2800).Monsters.Num() == 0)
-		{ Drastate = EDraState::DraIdle; } return; }
+	if (TimeFire < 1) return; 
 	TimeFire = 0.0f;
+
+	if (PlayerDistance() > 2800 || GetMonsterBySphere(Creature->GetActorLocation(),2800).Monsters.Num() == 0)
+	{ Drastate = EDraState::DraIdle; }
+	float Distance = 10000.0f;
+	AMonster* NearMonster = nullptr;
 	
-	TArray<FOverlapResult>Results;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(Dragon);
-	
-	bool bHit = GetWorld()->OverlapMultiByChannel(Results,Dragon->GetActorLocation(),
-		FQuat::Identity,ECC_Pawn,FCollisionShape::MakeSphere(Radios),Params);
-	if (bHit)
+	for (AMonster* Monster : GetMonsterBySphere(Dragon->GetActorLocation(),Radios).Monsters)
 	{
-		float Distance = 10000.0f;
-		for (FOverlapResult Result: Results)
+		if (FVector::Distance(Monster->GetActorLocation(), Dragon->GetActorLocation()) < Distance)
 		{
-			AMonster* Monster = Cast<AMonster>(Result.GetActor());
-			if (Monster)
-			{
-				float CurDist = FVector::Distance(Dragon->GetActorLocation(),Result.GetActor()->GetActorLocation());
-				if (CurDist < Distance)
-				{
-					Distance = CurDist;
-					NearMonster = Monster;
-				}
-			}
-		}
-		if (NearMonster)
-		{
-			if (ACreBullet* Bullet = GetWorld()->SpawnActor<ACreBullet>(CreBulletFactory))
-			{
-				Bullet->CreDraFsm = this;
-				Bullet->SetActorScale3D(FVector(1.5,1.5,1.5));
-				Bullet->SetActorLocation(Dragon->GetActorLocation()+Dragon->GetActorForwardVector() * 75);
-				FVector dist = NearMonster->GetActorLocation() - Dragon->GetActorLocation();
-				// DrawDebugSphere(GetWorld(),NearMonster->GetActorLocation(),50,15,FColor::Red,false,1.0f);
-				Bullet->ProjectileComp->ProjectileGravityScale = 0.0f;
-				Bullet->ProjectileComp->Velocity = dist.GetSafeNormal() * 2500;
-			}
-			// AttackMonster(NearMonster);
-			// NearMonster->MonsterStruct.CurrentHp -= Dragon->CreFsm->CreStruct.Atk;
-			// NearMonster->SetHpBar();
-			// NearMonster->DamageUi(CreatureDamage());
-			// if (NearMonster->MonsterStruct.CurrentHp <= 0)
-			// {
-			// 	CreStruct.CurrentExp += NearMonster->MonsterStruct.Exp;
-				// NearMonster->Dead();
-			// 	SetCreStat();
-			// 	GetMonGold(NearMonster);
-			// }
-			
-			FVector dist = NearMonster->GetActorLocation() - Dragon->GetActorLocation();
-			Dragon->SetActorRotation(dist.GetSafeNormal().Rotation());
+			Distance = FVector::Distance(Monster->GetActorLocation(), Dragon->GetActorLocation());
+			NearMonster = Monster;
 		}
 	}
+	if (NearMonster)
+	{
+		ACreBullet* Bullet = GetWorld()->SpawnActor<ACreBullet>(CreBulletFactory);
+		Bullet->SetActorScale3D(FVector(1.5,1.5,1.5));
+		Bullet->SetActorLocation(Dragon->GetActorLocation() + Dragon->GetActorForwardVector() * 75);
+		Bullet->ProjectileComp->ProjectileGravityScale = 0.0f;
+		Bullet->ProjectileComp->Velocity = (NearMonster->GetActorLocation() - Dragon->GetActorLocation()).GetSafeNormal() * 2500;
+		Dragon->SetActorRotation((NearMonster->GetActorLocation() - Dragon->GetActorLocation()).GetSafeNormal().Rotation());
+	}
+	
+	// TArray<FOverlapResult>Results;
+	// FCollisionQueryParams Params;
+	// Params.AddIgnoredActor(Dragon);
+	//
+	// bool bHit = GetWorld()->OverlapMultiByChannel(Results,Dragon->GetActorLocation(),
+	// 	FQuat::Identity,ECC_Pawn,FCollisionShape::MakeSphere(Radios),Params);
+	// if (bHit)
+	// {
+	// 	float Distance = 10000.0f;
+	// 	for (FOverlapResult Result: Results)
+	// 	{
+	// 		AMonster* Monster = Cast<AMonster>(Result.GetActor());
+	// 		if (Monster)
+	// 		{
+	// 			float CurDist = FVector::Distance(Dragon->GetActorLocation(),Result.GetActor()->GetActorLocation());
+	// 			if (CurDist < Distance)
+	// 			{
+	// 				Distance = CurDist;
+	// 				NearMonster = Monster;
+	// 			}
+	// 		}
+	// 	}
+	// 	if (NearMonster)
+	// 	{
+	// 		if (ACreBullet* Bullet = GetWorld()->SpawnActor<ACreBullet>(CreBulletFactory))
+	// 		{
+	// 			Bullet->CreDraFsm = this;
+	// 			Bullet->SetActorScale3D(FVector(1.5,1.5,1.5));
+	// 			Bullet->SetActorLocation(Dragon->GetActorLocation()+Dragon->GetActorForwardVector() * 75);
+	// 			FVector dist = NearMonster->GetActorLocation() - Dragon->GetActorLocation();
+	// 			// DrawDebugSphere(GetWorld(),NearMonster->GetActorLocation(),50,15,FColor::Red,false,1.0f);
+	// 			Bullet->ProjectileComp->ProjectileGravityScale = 0.0f;
+	// 			Bullet->ProjectileComp->Velocity = dist.GetSafeNormal() * 2500;
+	// 		}
+	// 		FVector dist = NearMonster->GetActorLocation() - Dragon->GetActorLocation();
+	// 		Dragon->SetActorRotation(dist.GetSafeNormal().Rotation());
+	// 	}
+	// }
 }
 
 void UCreDraFsm::DraAttackMultiPre(float time, float Radius)
 {
-	// UE_LOG(LogTemp,Warning,TEXT("CreDraFsm 멀티공격준비 초시계%f"),CurrentTime)
 	CurrentTime += GetWorld()->GetDeltaSeconds();
 	if (CurrentTime < time)
 	{ return; }
@@ -280,25 +287,6 @@ void UCreDraFsm::DraAttackMultiPre(float time, float Radius)
 		Dragon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		Drastate = EDraState::DraAttackMulti;
 	}
-	// TArray<FOverlapResult>HitResults;
-	// FCollisionQueryParams Params;
-	// Params.AddIgnoredActor(Dragon); 
-	// bool bHit = GetWorld()->OverlapMultiByChannel(HitResults,Dragon->GetActorLocation(),
-	// 	FQuat::Identity,ECC_Pawn,FCollisionShape::MakeSphere(Radius),Params);
-	// if (bHit)
-	// {
-	// 	for (FOverlapResult Result : HitResults)
-	// 	{
-	// 		if (AMonster* Monster = Cast<AMonster>(Result.GetActor()))
-	// 		{
-	// 			if (!Monsters.Contains(Monster))
-	// 			{
-	// 				Monsters.Add(Monster);
-	// 				UE_LOG(LogTemp,Warning,TEXT("CraDraFsm 몬스터 몇마리씩 담기노 %d 네임 %s"),Monsters.Num(),*Monster->GetName())
-	// 			}
-	// 		}
-	// 	}
-	// }
 }
 
 void UCreDraFsm::DraAttackMulti(float time)

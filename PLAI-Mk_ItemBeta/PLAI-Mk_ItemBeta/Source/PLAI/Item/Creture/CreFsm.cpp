@@ -46,6 +46,8 @@ void UCreFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 
 void UCreFsm::AttackMonster(AMonster* Monster)
 {
+	if (!IsValid(Monster)) return;;
+
 	bool Critical = false;
 	int Damage = 0;
 	if (CreStruct.Crit > FMath::FRandRange(0.0f,100.0f))

@@ -65,11 +65,6 @@ void ACreBullet::OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, A
 		ENCPoolMethod::AutoRelease);
 		NiagaraComponent->SetActive(true);
 		Destroy();
-		
-		if (CreDraFsm)
-		{
-			
-		}
 	}
 	else
 	{
