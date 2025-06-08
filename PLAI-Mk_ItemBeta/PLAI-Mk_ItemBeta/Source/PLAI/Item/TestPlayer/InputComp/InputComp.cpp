@@ -191,8 +191,16 @@ void UInputComp::On_LeftMouseStart()
 	// 턴제 월드 몬스터 찾기
 	if (ATurnMonsterWorld* TurnMonsterWorld = Cast<ATurnMonsterWorld>(Hit.GetActor()))
 	{
+		UE_LOG(LogTemp,Warning,TEXT("InputComp 턴몬스터찾기 [%s]"),*Hit.GetActor()->GetName())
 		if (ATurnTile* TurnTile = Cast<ATurnTile>(UGameplayStatics::GetActorOfClass(GetWorld(),ATurnTile::StaticClass())))
-		{ TestPlayer->SetActorLocation(TurnTile->GetActorLocation() + FVector(0,0,100));}
+		{
+			UE_LOG(LogTemp,Warning,TEXT("InputComp 턴타일 위치 [%s]"),*TurnTile->GetActorLocation().ToString())
+			TestPlayer->SetActorLocation(TurnTile->GetActorLocation() + FVector(0,0,100));
+		}
+		else
+		{
+			UE_LOG(LogTemp,Warning,TEXT("InputComp 턴타일 위치 못찾음"));
+		}
 	}
 	
 	// Npc 찾기 창 끄기
