@@ -85,8 +85,31 @@ FVector UMonFsm::RandLocation(float X, float Y, float Z)
 
 void UMonFsm::MoveDestination()
 {
+	FHitResult Hit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(Monster);
+	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Monster->GetActorLocation() + FVector(0,0,1000),
+	Monster->GetActorLocation() + FVector(0,0,-1000),ECC_GameTraceChannel1, Params);
+
 	FVector Distance = TargetLocation - Monster->GetActorLocation();
-	Monster->AddActorWorldOffset(Distance.GetSafeNormal() * 10,false);
+    if (bHit)
+    {
+	    if (FVector::Distance(Monster->GetActorLocation(),Hit.ImpactPoint) > 10)
+	    {
+		    if (Monster->GetActorLocation().Z > Hit.ImpactPoint.Z)
+		    {
+		    	Monster->AddActorLocalOffset(FVector(0,0,-50),false);
+		    }
+	    	else
+	    	{
+	    		Monster->AddActorLocalOffset(FVector(0,0,50),false);
+	    	}
+	    }
+    }
+
+	FRotator Rotator = UKismetMathLibrary::MakeRotFromYZ(Monster->GetActorRightVector(),Hit.ImpactNormal);
+	Monster->SetActorRotation(Rotator);
+	Monster->AddActorWorldOffset(Distance.GetSafeNormal()*10,false);
 
 	if (Distance.Length() < 75)
 	{
@@ -102,9 +125,9 @@ void UMonFsm::MoveDestination()
 	if (bRotator == true)
 	{
 		CurrentTime += GetWorld()->DeltaTimeSeconds;
-		FRotator Rotator = UKismetMathLibrary::RLerp(Monster->GetActorRotation(), Distance.GetSafeNormal().Rotation(),
+		FRotator LerpRotator = UKismetMathLibrary::RLerp(Monster->GetActorRotation(), Distance.GetSafeNormal().Rotation(),
 		CurrentTime, false);
-		Monster->SetActorRotation(Rotator);
+		Monster->SetActorRotation(LerpRotator);
 		if (CurrentTime > 1)
 		{
 			CurrentTime = 0.0f;
@@ -112,16 +135,15 @@ void UMonFsm::MoveDestination()
 		}
 	}
 	
-	FHitResult Hit;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(Monster);
-	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Monster->GetActorLocation() + FVector(0,0,300),
-		Monster->GetActorLocation() + FVector(0,0,-300),ECC_GameTraceChannel1,Params);
-	if(bHit)
-	{
-		FRotator Rotator = UKismetMathLibrary::MakeRotFromYZ(Monster->GetActorRightVector(),Hit.ImpactNormal);
-		Monster->SetActorRotation(Rotator);
-	}
+	// FHitResult Hit;
+	// FCollisionQueryParams Params;
+	// Params.AddIgnoredActor(Monster);
+	// bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Monster->GetActorLocation() + FVector(0,0,300),
+	// 	Monster->GetActorLocation() + FVector(0,0,-300),ECC_GameTraceChannel1,Params);
+	// if(bHit)
+	// {
+	// 	
+	// }
 }
 
 void UMonFsm::LineDestination()

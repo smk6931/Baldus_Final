@@ -54,6 +54,9 @@ public:
 	FVector RandLoc;
 
 	UPROPERTY(EditAnywhere)
+	FVector OffsetVector;
+
+	UPROPERTY(EditAnywhere)
 	float distLength;
 
 	void Idle();
