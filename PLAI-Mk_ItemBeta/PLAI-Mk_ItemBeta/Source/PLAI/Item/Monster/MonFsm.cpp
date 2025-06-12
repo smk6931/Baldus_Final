@@ -98,11 +98,11 @@ void UMonFsm::MoveDestination()
 	    {
 		    if (Monster->GetActorLocation().Z > Hit.ImpactPoint.Z)
 		    {
-		    	Monster->AddActorLocalOffset(FVector(0,0,-50),false);
+		    	Monster->AddActorLocalOffset(FVector(0,0,-5),false);
 		    }
 	    	else
 	    	{
-	    		Monster->AddActorLocalOffset(FVector(0,0,50),false);
+	    		Monster->AddActorLocalOffset(FVector(0,0,5),false);
 	    	}
 	    }
     }
