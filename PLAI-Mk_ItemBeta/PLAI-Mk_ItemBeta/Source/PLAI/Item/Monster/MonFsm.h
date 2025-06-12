@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Monster.h"
 #include "Components/ActorComponent.h"
 #include "MonFsm.generated.h"
 
@@ -54,9 +55,6 @@ public:
 	FVector RandLoc;
 
 	UPROPERTY(EditAnywhere)
-	FVector OffsetVector;
-
-	UPROPERTY(EditAnywhere)
 	float distLength;
 
 	void Idle();
@@ -70,6 +68,8 @@ public:
 
 	void MoveDestination();
 	void LineDestination();
+	
+	FHitResult LineTraceResult(FVector Location);
 
 	bool bTimer = false;
 	bool bRotator =false;

@@ -2,10 +2,7 @@
 
 
 #include "MonFsm.h"
-
-#include "MaterialHLSLTree.h"
 #include "Monster.h"
-#include "Kismet/KismetMaterialLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 
 
@@ -80,35 +77,29 @@ FVector UMonFsm::RandLocation(float X, float Y, float Z)
 	return FVector(x,y,z);
 }
 
-// DrawDebugLine(GetWorld(),Monster->GetActorLocation(),TargetLocation,FColor::Blue,false,0.02f);
-//    DrawDebugSphere(GetWorld(),TargetLocation,20,30,FColor::Blue,false,0.02f);
 
 void UMonFsm::MoveDestination()
 {
-	FHitResult Hit;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(Monster);
-	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Monster->GetActorLocation() + FVector(0,0,1000),
-	Monster->GetActorLocation() + FVector(0,0,-1000),ECC_GameTraceChannel1, Params);
-
+	FHitResult Hit = LineTraceResult(Monster->GetActorLocation());
+	
+	if (FVector::Distance(Monster->GetActorLocation(), Hit.ImpactPoint))
+	{
+		if (Monster->GetActorLocation().Z > Hit.ImpactPoint.Z)
+		{
+			Monster->AddActorLocalOffset(FVector(0,0,-5),false);
+		}
+		else
+		{
+			Monster->AddActorLocalOffset(FVector(0,0,5),false);
+		}
+	}
 	FVector Distance = TargetLocation - Monster->GetActorLocation();
-    if (bHit)
-    {
-	    if (FVector::Distance(Monster->GetActorLocation(),Hit.ImpactPoint) > 10)
-	    {
-		    if (Monster->GetActorLocation().Z > Hit.ImpactPoint.Z)
-		    {
-		    	Monster->AddActorLocalOffset(FVector(0,0,-5),false);
-		    }
-	    	else
-	    	{
-	    		Monster->AddActorLocalOffset(FVector(0,0,5),false);
-	    	}
-	    }
-    }
-
-	FRotator Rotator = UKismetMathLibrary::MakeRotFromYZ(Monster->GetActorRightVector(),Hit.ImpactNormal);
-	Monster->SetActorRotation(Rotator);
+	if (Distance.Length() > 75)
+	{
+		FRotator Rotator = UKismetMathLibrary::MakeRotFromYZ(Monster->GetActorRightVector(),Hit.ImpactNormal);
+		FRotator LerpRotator = UKismetMathLibrary::RLerp(Monster->GetActorRotation(),Rotator,GetWorld()->GetDeltaSeconds() * 5.0f,true);
+		Monster->SetActorRotation(LerpRotator);
+	}
 	Monster->AddActorWorldOffset(Distance.GetSafeNormal()*10,false);
 
 	if (Distance.Length() < 75)
@@ -126,24 +117,14 @@ void UMonFsm::MoveDestination()
 	{
 		CurrentTime += GetWorld()->DeltaTimeSeconds;
 		FRotator LerpRotator = UKismetMathLibrary::RLerp(Monster->GetActorRotation(), Distance.GetSafeNormal().Rotation(),
-		CurrentTime, false);
+		CurrentTime / 2.5, true);
 		Monster->SetActorRotation(LerpRotator);
-		if (CurrentTime > 1)
+		if (CurrentTime > 2.5)
 		{
 			CurrentTime = 0.0f;
 			bRotator = false;
 		}
 	}
-	
-	// FHitResult Hit;
-	// FCollisionQueryParams Params;
-	// Params.AddIgnoredActor(Monster);
-	// bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Monster->GetActorLocation() + FVector(0,0,300),
-	// 	Monster->GetActorLocation() + FVector(0,0,-300),ECC_GameTraceChannel1,Params);
-	// if(bHit)
-	// {
-	// 	
-	// }
 }
 
 void UMonFsm::LineDestination()
@@ -161,6 +142,26 @@ void UMonFsm::LineDestination()
 		TargetLocation = Hit.ImpactPoint;
 	}
 }
+
+FHitResult UMonFsm::LineTraceResult(FVector Location)
+{
+	FHitResult Hit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(Monster);
+	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Location+FVector(0,0,1000),
+		Location+FVector(0,0,-1000),ECC_GameTraceChannel1,Params);
+	if(bHit)
+	{
+		return Hit;
+	}
+	else
+	{
+		return FHitResult();
+	}
+}
+
+
+
 
 // DrawDebugLine(GetWorld(),Start,TargetLocation,FColor::Red,false,2.0f);
 // DrawDebugSphere(GetWorld(),TargetLocation,10,10,FColor::Red,false,2.0f);
