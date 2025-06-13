@@ -59,7 +59,7 @@ void AMonSpawn::SpawnMonster()
 	Monsters.RemoveAll([](const TWeakObjectPtr<AMonster>& Monster)
 	{ return !Monster.IsValid(); });
 	
-	if (Monsters.Num() > 7) return;
+	if (Monsters.Num() > 0) return;
 	
 	FHitResult Hit;
 	FCollisionQueryParams Params;

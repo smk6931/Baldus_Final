@@ -7,6 +7,8 @@
 #include "PLAI/Public//BaseFile/PLAICharacter.h"
 #include "TestPlayer.generated.h"
 
+class UUiPlayerHpBar;
+
 UCLASS()
 class PLAI_API ATestPlayer : public APLAICharacter
 {
@@ -57,6 +59,15 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	class USceneCaptureComponent2D* CaptureComp;
+
+	// UPROPERTY(EditAnywhere)
+	// TSubclassOf<UUiPlayerHpBar> UiPlayerHpBarFactory;
+	
+	// UPROPERTY(EditAnywhere)
+	// class UUiPlayerHpBar* UiPlayerHpBar;
+	
+	// UPROPERTY(EditAnywhere)
+	// class UWidgetComponent* UiWidgetComp;
 
 	UPROPERTY(EditAnywhere)
 	class UNiagaraComponent* NiagaraComp;

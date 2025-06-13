@@ -165,6 +165,10 @@ public:
     FPosition position;
     UPROPERTY(EditAnywhere,BlueprintReadWrite)
     Fstats stats;
+
+    // characterInfo 추가한 내용들
+    int32 CurrentHp = 100;
+    int32 MaxHp = 100;
 };
 
 USTRUCT(BlueprintType)

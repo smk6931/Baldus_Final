@@ -5,7 +5,10 @@
 #include "Monster.h"
 #include "Engine/OverlapResult.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "PLAI/Item/ItemComp/InvenComp.h"
+#include "PLAI/Item/Login/LoginComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/UI/Main/UiChaView.h"
 
 
 // Sets default values for this component's properties
@@ -85,10 +88,14 @@ void UMonFsm::AroundVoid(float AttackRange)
 	 AttackAroundTime += GetWorld()->GetDeltaSeconds();
 	if (AttackAroundTime <= GetWorld()->GetDeltaSeconds())
 	{
+		UE_LOG(LogTemp,Warning,TEXT("UMonFsm::AroundVoid 테스트 플레이어 찾는중임"));
+		
 		for (FOverlapResult Result : OverlapMultiResult())
 		{
+			UE_LOG(LogTemp,Warning,TEXT("UMonFsm::AroundVoid 테스트 플레이어 찾는중임 엑터이름은?[%s]"),*Result.GetActor()->GetName());
 			if (ATestPlayer* Player = Cast<ATestPlayer>(Result.GetActor()))
 			{
+				UE_LOG(LogTemp,Warning,TEXT("UMonFsm::AroundVoid 테스트 플레이어 찾았음"));
 				TestPlayer = Player;
 				TargetLocation = LineTraceResult(TestPlayer->GetActorLocation()).ImpactPoint;
 				
@@ -127,6 +134,7 @@ void UMonFsm::AroundVoid(float AttackRange)
 
 	if (TestPlayer && FVector::Distance(Monster->GetActorLocation(), TestPlayer->GetActorLocation()) < AttackRange)
 	{
+		UE_LOG(LogTemp,Warning,TEXT("UMonFsm::AroundVoid 테스트 플레이어 찾고 Monster Attack 모드 진입"));
 		MonState = EMonState::Attack;
 	}
 
@@ -173,6 +181,8 @@ void UMonFsm::AttackVoid(float AttackRange)
 			USkeletalMeshComponent* MeshComp = Monster->GetMesh();
 			UAnimInstance* AnimInstance = MeshComp ? MeshComp->GetAnimInstance() : nullptr;
 			AnimInstance->Montage_Play(MontageAttack);
+			TestPlayer->LoginComp->UserFullInfo.character_info.CurrentHp -= Monster->MonsterStruct.Attack;
+			TestPlayer->InvenComp->MenuInven->Wbp_ChaView->SetUiChaView(TestPlayer->LoginComp->UserFullInfo);
 		}
 	}
 	if (TimeAttack > 2)
@@ -229,7 +239,8 @@ TArray<FOverlapResult> UMonFsm::OverlapMultiResult(float Distance)
 		FQuat::Identity, ECC_Visibility,
 		FCollisionShape::MakeSphere(Distance),Params);
 
-	// DrawDebugSphere(GetWorld(),Monster->GetActorLocation(),Distance,15,FColor::Yellow,false,1)
+	// DrawDebugCircle(GetWorld(),Monster->GetActorLocation(),Distance,15,FColor::Yellow,false,1 ,0,
+	// 	0.0f,FVector(1, 0, 0),FVector(0, 1, 0),false);
 
 	return Results;
 }

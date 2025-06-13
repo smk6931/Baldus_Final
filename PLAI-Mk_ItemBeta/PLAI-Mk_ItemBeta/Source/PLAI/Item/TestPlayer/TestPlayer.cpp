@@ -4,9 +4,11 @@
 #include "TestPlayer.h"
 
 #include "NiagaraComponent.h"
+#include "UiPlayerHpBar.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/SceneCaptureComponent2D.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/GameState.h"
 #include "GameFramework/PlayerState.h"
@@ -45,14 +47,21 @@ ATestPlayer::ATestPlayer()
 	CaptureComp = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("CaptureComp"));
 	CaptureComp->SetupAttachment(RootComponent);
 
+	// UiWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("UiWidgetComp"));
+	// UiWidgetComp->SetupAttachment(RootComponent);
+	
 	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>("NIagaraComp");
-	// NiagaraComp->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
 void ATestPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// UiPlayerHpBar = CreateWidget<UUiPlayerHpBar>(GetWorld(),UiPlayerHpBarFactory);
+	// UiWidgetComp->SetWidget(UiPlayerHpBar);
+	// UiWidgetComp->SetWidgetSpace(EWidgetSpace::World);
+	
     if (IsLocallyControlled())
     {
     	CaptureComp->PrimaryComponentTick.bCanEverTick = true;

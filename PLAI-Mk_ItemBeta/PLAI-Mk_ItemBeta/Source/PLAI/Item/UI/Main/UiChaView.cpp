@@ -12,9 +12,15 @@ void UUiChaView::SetUiChaView(FUserFullInfo UserFullInfo)
 	NameCha->SetText(FText::FromString(UserFullInfo.character_info.character_name));
 	JobCha->SetText(FText::FromString(UserFullInfo.character_info.job));
 	LevCha->SetText(FText::AsNumber(UserFullInfo.character_info.level));
+	
+	ExpPercent->SetText(FText::FromString(FString::Printf(
+		TEXT("%.3f"),static_cast<float>(UserFullInfo.character_info.current_exp)/static_cast<float>(UserFullInfo.character_info.max_exp))));
 	ExpCha->SetText(FText::AsNumber(UserFullInfo.character_info.current_exp));
 	MaxExpCha->SetText(FText::AsNumber(UserFullInfo.character_info.max_exp));
 	ExpBar->SetPercent(static_cast<float>(UserFullInfo.character_info.current_exp) /  static_cast<float>(UserFullInfo.character_info.max_exp));
-	ExpPercent->SetText(FText::AsNumber(static_cast<float>(UserFullInfo.character_info.current_exp)/static_cast<float>(UserFullInfo.character_info.max_exp)));
-	HpBar->SetPercent(static_cast<float>(UserFullInfo.character_info.stats.hp) /  static_cast<float>(UserFullInfo.character_info.stats.hp));
+
+	CurrentHp->SetText(FText::AsNumber(UserFullInfo.character_info.CurrentHp));
+	MaxHp->SetText(FText::AsNumber(UserFullInfo.character_info.MaxHp));
+	HpBar->SetPercent(static_cast<float>(UserFullInfo.character_info.current_exp) /  static_cast<float>(UserFullInfo.character_info.MaxHp));
+
 }

@@ -10,7 +10,11 @@
 #include "PLAI/Item/Login/UserStruct.h"
 #include "Components/TextBlock.h"
 #include "PLAI/Item/GameInstance/WorldGi.h"
+#include "PLAI/Item/ItemComp/InvenComp.h"
+#include "PLAI/Item/Login/LoginComp.h"
+#include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/TestPlayer/TraitStructTable/TraitStructTable.h"
+#include "PLAI/Item/UI/Main/UiChaView.h"
 
 void UUIChaStat::SetUiChaStat(FUserFullInfo* UserFullInfo)
 {
@@ -142,7 +146,14 @@ void UUIChaStat::SetUiChaStat(FUserFullInfo* UserFullInfo)
 	UserFullInfoStat.character_info.stats.critical_damage = (UserFullInfo->character_info.stats.critical_damage+ECriD) *(1.0f + TCriD/100.0f);
 	UserFullInfoStat.character_info.stats.speed = (UserFullInfo->character_info.stats.speed + ESpd) * (1.0f + TSpd/100.0f);
 	UserFullInfoStat.character_info.stats.move_range = (UserFullInfo->character_info.stats.move_range+EMov) *(1.0f + TMov/100.0f);
+
+	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
+	{
+		TestPlayer->LoginComp->UserFullInfo.character_info.MaxHp = UserFullInfoStat.character_info.stats.hp;
+		TestPlayer->InvenComp->MenuInven->Wbp_ChaView->SetUiChaView(TestPlayer->LoginComp->UserFullInfo);
+	}
 	
 	UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance());
 	WorldGi->UserFullInfoGiStat = UserFullInfoStat;
+	
 }

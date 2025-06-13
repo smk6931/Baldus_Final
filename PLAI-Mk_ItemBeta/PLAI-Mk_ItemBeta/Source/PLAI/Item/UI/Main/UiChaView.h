@@ -29,6 +29,12 @@ public:
 	class UTextBlock* ExpCha;
 
 	UPROPERTY(meta = (BindWidget = "Widget"))
+	class UTextBlock* CurrentHp;
+
+	UPROPERTY(meta = (BindWidget = "Widget"))
+	class UTextBlock* MaxHp;
+
+	UPROPERTY(meta = (BindWidget = "Widget"))
 	class UTextBlock* MaxExpCha;
 
 	UPROPERTY(meta = (BindWidget = "Widget"))
