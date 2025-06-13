@@ -69,33 +69,7 @@ void UMonFsm::Around()
 
 void UMonFsm::Attack()
 {
-	if (!TestPlayer) return;
-
-	FVector Distance = LineTraceResult(TestPlayer->GetActorLocation()).ImpactPoint - Monster->GetActorLocation();
-	
-	TimeAttack += GetWorld()->GetDeltaSeconds();
-	UE_LOG(LogTemp,Warning,TEXT("MonFsm TimeAttack 초시계 [%f]"),TimeAttack)
-	
-	if (TimeAttack <= GetWorld()->GetDeltaSeconds())
-	{
-		UE_LOG(LogTemp,Warning,TEXT("MonFsm TimeAttack 초시계 0초에 실행 [%f]"),TimeAttack)
-		Monster->SetActorRotation(Distance.GetSafeNormal().Rotation());
-		if (MontageAttack)
-		{
-			USkeletalMeshComponent* MeshComp = Monster->GetMesh();
-			UAnimInstance* AnimInstance = MeshComp ? MeshComp->GetAnimInstance() : nullptr;
-			AnimInstance->Montage_Play(MontageAttack);
-		}
-	}
-	if (TimeAttack > 2)
-	{
-		TimeAttack = 0;
-		if (Distance.Length() > 300)
-		{
-			TargetLocation = LineTraceResult(TestPlayer->GetActorLocation()).ImpactPoint;
-			MonState = EMonState::Around;
-		}
-	}
+	AttackVoid();
 }
 
 FVector UMonFsm::RandLocation(float X, float Y, float Z)
@@ -178,6 +152,37 @@ void UMonFsm::MoveDestination(float AttackRange)
 		{
 			CurrentTime = 0.0f;
 			bRotator = false;
+		}
+	}
+}
+
+void UMonFsm::AttackVoid(float AttackRange)
+{
+	if (!TestPlayer) return;
+
+	FVector Distance = LineTraceResult(TestPlayer->GetActorLocation()).ImpactPoint - Monster->GetActorLocation();
+	
+	TimeAttack += GetWorld()->GetDeltaSeconds();
+	UE_LOG(LogTemp,Warning,TEXT("MonFsm TimeAttack 초시계 [%f]"),TimeAttack)
+	
+	if (TimeAttack <= GetWorld()->GetDeltaSeconds())
+	{
+		UE_LOG(LogTemp,Warning,TEXT("MonFsm TimeAttack 초시계 0초에 실행 [%f]"),TimeAttack)
+		Monster->SetActorRotation(Distance.GetSafeNormal().Rotation());
+		if (MontageAttack)
+		{
+			USkeletalMeshComponent* MeshComp = Monster->GetMesh();
+			UAnimInstance* AnimInstance = MeshComp ? MeshComp->GetAnimInstance() : nullptr;
+			AnimInstance->Montage_Play(MontageAttack);
+		}
+	}
+	if (TimeAttack > 2)
+	{
+		TimeAttack = 0;
+		if (Distance.Length() > AttackRange)
+		{
+			TargetLocation = LineTraceResult(TestPlayer->GetActorLocation()).ImpactPoint;
+			MonState = EMonState::Around;
 		}
 	}
 }

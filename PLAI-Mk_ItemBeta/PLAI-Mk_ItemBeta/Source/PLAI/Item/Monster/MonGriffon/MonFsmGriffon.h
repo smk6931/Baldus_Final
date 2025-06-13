@@ -25,5 +25,6 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
-	virtual void Around();
+	virtual void Around() override;
+	virtual void Attack() override;
 };

@@ -38,3 +38,8 @@ void UMonFsmGriffon::Around()
 	MoveDestination(1000);
 }
 
+void UMonFsmGriffon::Attack()
+{
+	AttackVoid(1500);
+}
+
