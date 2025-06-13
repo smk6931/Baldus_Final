@@ -40,6 +40,12 @@ public:
 
     UPROPERTY(EditAnywhere)
 	float CurrentTime = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+	float AttackAroundTime = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+	float TimeAttack = 0.0f;
 	
 	UPROPERTY(EditAnywhere)
 	EMonState MonState = EMonState::Idle;
@@ -55,8 +61,11 @@ public:
 	FVector RandLoc;
 
 	UPROPERTY(EditAnywhere)
-	float distLength;
+	class ATestPlayer* TestPlayer;
 
+	UPROPERTY(EditAnywhere)
+	float distLength;
+	
 	void Idle();
 	void Around();
 	void Attack();
@@ -70,6 +79,8 @@ public:
 	void LineDestination();
 	
 	FHitResult LineTraceResult(FVector Location);
+	
+    TArray<FOverlapResult>OverlapMultiResult(float Distance = 1200.0f);
 
 	bool bTimer = false;
 	bool bRotator =false;
