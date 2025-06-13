@@ -14,5 +14,7 @@ void UUiChaView::SetUiChaView(FUserFullInfo UserFullInfo)
 	LevCha->SetText(FText::AsNumber(UserFullInfo.character_info.level));
 	ExpCha->SetText(FText::AsNumber(UserFullInfo.character_info.current_exp));
 	MaxExpCha->SetText(FText::AsNumber(UserFullInfo.character_info.max_exp));
-	ExpBar->SetPercent( static_cast<float>(UserFullInfo.character_info.current_exp) /  static_cast<float>(UserFullInfo.character_info.max_exp));
+	ExpBar->SetPercent(static_cast<float>(UserFullInfo.character_info.current_exp) /  static_cast<float>(UserFullInfo.character_info.max_exp));
+	ExpPercent->SetText(FText::AsNumber(static_cast<float>(UserFullInfo.character_info.current_exp)/static_cast<float>(UserFullInfo.character_info.max_exp)));
+	HpBar->SetPercent(static_cast<float>(UserFullInfo.character_info.stats.hp) /  static_cast<float>(UserFullInfo.character_info.stats.hp));
 }

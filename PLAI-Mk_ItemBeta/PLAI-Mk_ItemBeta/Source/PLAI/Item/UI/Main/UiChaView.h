@@ -32,7 +32,16 @@ public:
 	class UTextBlock* MaxExpCha;
 
 	UPROPERTY(meta = (BindWidget = "Widget"))
+	class UTextBlock* ExpPercent;
+
+	UPROPERTY(meta = (BindWidget = "Widget"))
 	class UProgressBar* ExpBar;
 
+	UPROPERTY(meta = (BindWidget = "Widget"))
+	class UProgressBar* HpBar;
+	
+	UPROPERTY(meta = (BindWidget = "Widget"))
+	class UProgressBar* MpBar;
+	
 	void SetUiChaView(FUserFullInfo UserFullInfo);
 };
