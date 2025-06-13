@@ -70,15 +70,18 @@ public:
 	UAnimMontage* MontageAttack;
 	
 	void Idle();
-	void Around();
-	void Attack();
+	virtual void Around();
+	virtual void Attack();
 
 	bool bMoveArrive = false;
 
-	FVector RandLocation(float X = 1000.0f, float Y = 1000.0f, float Z = 50.0f);
+	virtual FVector RandLocation(float X = 1000.0f, float Y = 1000.0f, float Z = 50.0f);
+	
 	float RandLocationFloat = 1000.0f;
 
-	void MoveDestination();
+	virtual void MoveDestination(float AttackRange = 400.0f);
+	virtual void AttackVoid();
+	
 	void LineDestination();
 	
 	FHitResult LineTraceResult(FVector Location);

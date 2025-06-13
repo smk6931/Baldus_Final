@@ -33,3 +33,8 @@ void UMonFsmGriffon::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	// ...
 }
 
+void UMonFsmGriffon::Around()
+{
+	MoveDestination(1000);
+}
+

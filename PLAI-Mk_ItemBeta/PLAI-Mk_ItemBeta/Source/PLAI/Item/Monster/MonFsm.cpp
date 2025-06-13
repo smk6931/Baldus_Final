@@ -107,7 +107,7 @@ FVector UMonFsm::RandLocation(float X, float Y, float Z)
 }
 
 
-void UMonFsm::MoveDestination()
+void UMonFsm::MoveDestination(float AttackRange)
 {
     AttackAroundTime += GetWorld()->GetDeltaSeconds();
 	if (AttackAroundTime <= GetWorld()->GetDeltaSeconds())
@@ -152,7 +152,7 @@ void UMonFsm::MoveDestination()
 	}
 	Monster->AddActorWorldOffset(Distance.GetSafeNormal()*10,false);
 
-	if (TestPlayer && FVector::Distance(Monster->GetActorLocation(), TestPlayer->GetActorLocation()) < 400)
+	if (TestPlayer && FVector::Distance(Monster->GetActorLocation(), TestPlayer->GetActorLocation()) < AttackRange)
 	{
 		MonState = EMonState::Attack;
 	}
