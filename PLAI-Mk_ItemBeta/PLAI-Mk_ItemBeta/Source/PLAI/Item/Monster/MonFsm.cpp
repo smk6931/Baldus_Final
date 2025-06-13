@@ -71,25 +71,33 @@ void UMonFsm::Attack()
 {
 	if (!TestPlayer) return;
 	
-	FVector Distance = TestPlayer->GetActorLocation() - Monster->GetActorLocation();
-	if (Distance.Length() > 1200)
-	{
-		TestPlayer = nullptr;
-		MonState = EMonState::Idle;
-	}
-	if (Distance.Length() > 250)
-	{
-		Monster->AddActorWorldOffset(Distance.GetSafeNormal() * 10);
-	}
-	else
+	FVector Distance = LineTraceResult(TestPlayer->GetActorLocation()).ImpactPoint - Monster->GetActorLocation();
+	
+	if (Distance.Length() < 400)
 	{
 		TimeAttack += GetWorld()->GetDeltaSeconds();
 		if (TimeAttack > 2)
 		{
 			TimeAttack = 0;
-			DrawDebugSphere(GetWorld(),TestPlayer->GetActorLocation() + FVector(0,0,100),50,15,
+			Monster->SetActorRotation(Distance.GetSafeNormal().Rotation());
+			DrawDebugSphere(GetWorld(),TestPlayer->GetActorLocation() + FVector(0,0,300),75,15,
 				FColor::Red,false,1.0f);
+
+			if (!Monster || MontageAttack) return;
+			
+			USkeletalMeshComponent* MeshComp = Monster->GetMesh();
+			UAnimInstance* AnimInstance = MeshComp ? MeshComp->GetAnimInstance() : nullptr;
+
+			if (AnimInstance && !AnimInstance->Montage_IsPlaying(MontageAttack))
+			{
+				AnimInstance->Montage_Play(MontageAttack);
+			}
 		}
+	}
+	else
+	{
+		TargetLocation = LineTraceResult(TestPlayer->GetActorLocation()).ImpactPoint;
+		MonState = EMonState::Around;
 	}
 }
 
@@ -114,8 +122,9 @@ void UMonFsm::MoveDestination()
 			if (ATestPlayer* Player = Cast<ATestPlayer>(Result.GetActor()))
 			{
 				TestPlayer = Player;
-				Monster->SetActorRotation((Player->GetActorLocation() - Monster->GetActorLocation()).GetSafeNormal().Rotation());
-				MonState = EMonState::Attack;
+				TargetLocation = LineTraceResult(TestPlayer->GetActorLocation()).ImpactPoint;
+				
+				Monster->SetActorRotation((TargetLocation - Monster->GetActorLocation()).GetSafeNormal().Rotation());
 				break;
 			}
 			else { TestPlayer = nullptr; }
@@ -143,6 +152,11 @@ void UMonFsm::MoveDestination()
 		Monster->SetActorRotation(LerpRotator);
 	}
 	Monster->AddActorWorldOffset(Distance.GetSafeNormal()*10,false);
+
+	if (TestPlayer && FVector::Distance(Monster->GetActorLocation(), TestPlayer->GetActorLocation()) < 300)
+	{
+		MonState = EMonState::Attack;
+	}
 
 	if (Distance.Length() < 75)
 	{
@@ -190,7 +204,7 @@ FHitResult UMonFsm::LineTraceResult(FVector Location)
 	FHitResult Hits;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(Monster);
-	bool bHit = GetWorld()->LineTraceSingleByChannel(Hits,Location+FVector(0,0,1000),
+	bool bHit = GetWorld()->LineTraceSingleByObjectType(Hits,Location+FVector(0,0,1000),
 		Location+FVector(0,0,-1000),ECC_GameTraceChannel1,Params);
 	if(bHit)
 	{

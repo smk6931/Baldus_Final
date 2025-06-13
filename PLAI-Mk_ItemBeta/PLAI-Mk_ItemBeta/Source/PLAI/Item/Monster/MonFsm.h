@@ -66,6 +66,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	float distLength;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	UAnimMontage* MontageAttack;
+	
 	void Idle();
 	void Around();
 	void Attack();
