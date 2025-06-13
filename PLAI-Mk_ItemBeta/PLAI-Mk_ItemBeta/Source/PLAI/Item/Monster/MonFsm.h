@@ -79,7 +79,7 @@ public:
 	
 	float RandLocationFloat = 1000.0f;
 
-	virtual void MoveDestination(float AttackRange = 400.0f);
+	virtual void AroundVoid(float AttackRange = 400.0f);
 	virtual void AttackVoid(float AttackRange = 400.0f);
 	
 	void LineDestination();

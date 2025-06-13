@@ -20,8 +20,9 @@ void UMonFsmGriffon::BeginPlay()
 {
 	Super::BeginPlay();
 
+	RandLocationFloat = 2000.0f;
+	InitLocationFloat = 4500.0f;
 	// ...
-	
 }
 
 
@@ -35,11 +36,11 @@ void UMonFsmGriffon::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 void UMonFsmGriffon::Around()
 {
-	MoveDestination(1000);
+	AroundVoid(1000);
 }
 
 void UMonFsmGriffon::Attack()
 {
-	AttackVoid(1500);
+	AttackVoid(1200);
 }
 

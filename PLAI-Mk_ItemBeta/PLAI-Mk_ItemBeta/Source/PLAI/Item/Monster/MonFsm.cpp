@@ -64,7 +64,7 @@ void UMonFsm::Idle()
 
 void UMonFsm::Around()
 {
-	MoveDestination();
+	AroundVoid();
 }
 
 void UMonFsm::Attack()
@@ -80,10 +80,9 @@ FVector UMonFsm::RandLocation(float X, float Y, float Z)
 	return FVector(x,y,z);
 }
 
-
-void UMonFsm::MoveDestination(float AttackRange)
+void UMonFsm::AroundVoid(float AttackRange)
 {
-    AttackAroundTime += GetWorld()->GetDeltaSeconds();
+	 AttackAroundTime += GetWorld()->GetDeltaSeconds();
 	if (AttackAroundTime <= GetWorld()->GetDeltaSeconds())
 	{
 		for (FOverlapResult Result : OverlapMultiResult())
