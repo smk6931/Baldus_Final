@@ -70,34 +70,31 @@ void UMonFsm::Around()
 void UMonFsm::Attack()
 {
 	if (!TestPlayer) return;
-	
+
 	FVector Distance = LineTraceResult(TestPlayer->GetActorLocation()).ImpactPoint - Monster->GetActorLocation();
 	
-	if (Distance.Length() < 400)
+	TimeAttack += GetWorld()->GetDeltaSeconds();
+	UE_LOG(LogTemp,Warning,TEXT("MonFsm TimeAttack 초시계 [%f]"),TimeAttack)
+	
+	if (TimeAttack <= GetWorld()->GetDeltaSeconds())
 	{
-		TimeAttack += GetWorld()->GetDeltaSeconds();
-		if (TimeAttack > 2)
+		UE_LOG(LogTemp,Warning,TEXT("MonFsm TimeAttack 초시계 0초에 실행 [%f]"),TimeAttack)
+		Monster->SetActorRotation(Distance.GetSafeNormal().Rotation());
+		if (MontageAttack)
 		{
-			TimeAttack = 0;
-			Monster->SetActorRotation(Distance.GetSafeNormal().Rotation());
-			DrawDebugSphere(GetWorld(),TestPlayer->GetActorLocation() + FVector(0,0,300),75,15,
-				FColor::Red,false,1.0f);
-
-			if (!Monster || MontageAttack) return;
-			
 			USkeletalMeshComponent* MeshComp = Monster->GetMesh();
 			UAnimInstance* AnimInstance = MeshComp ? MeshComp->GetAnimInstance() : nullptr;
-
-			if (AnimInstance && !AnimInstance->Montage_IsPlaying(MontageAttack))
-			{
-				AnimInstance->Montage_Play(MontageAttack);
-			}
+			AnimInstance->Montage_Play(MontageAttack);
 		}
 	}
-	else
+	if (TimeAttack > 2)
 	{
-		TargetLocation = LineTraceResult(TestPlayer->GetActorLocation()).ImpactPoint;
-		MonState = EMonState::Around;
+		TimeAttack = 0;
+		if (Distance.Length() > 300)
+		{
+			TargetLocation = LineTraceResult(TestPlayer->GetActorLocation()).ImpactPoint;
+			MonState = EMonState::Around;
+		}
 	}
 }
 
@@ -113,10 +110,8 @@ FVector UMonFsm::RandLocation(float X, float Y, float Z)
 void UMonFsm::MoveDestination()
 {
     AttackAroundTime += GetWorld()->GetDeltaSeconds();
-	if (AttackAroundTime > 2)
+	if (AttackAroundTime <= GetWorld()->GetDeltaSeconds())
 	{
-		AttackAroundTime = 0.0f;
-		
 		for (FOverlapResult Result : OverlapMultiResult())
 		{
 			if (ATestPlayer* Player = Cast<ATestPlayer>(Result.GetActor()))
@@ -129,6 +124,10 @@ void UMonFsm::MoveDestination()
 			}
 			else { TestPlayer = nullptr; }
 		}
+	}
+	if (AttackAroundTime > 2)
+	{
+		AttackAroundTime = 0.0f;
 	}
 	
 	FHitResult Hit = LineTraceResult(Monster->GetActorLocation());
@@ -153,7 +152,7 @@ void UMonFsm::MoveDestination()
 	}
 	Monster->AddActorWorldOffset(Distance.GetSafeNormal()*10,false);
 
-	if (TestPlayer && FVector::Distance(Monster->GetActorLocation(), TestPlayer->GetActorLocation()) < 300)
+	if (TestPlayer && FVector::Distance(Monster->GetActorLocation(), TestPlayer->GetActorLocation()) < 400)
 	{
 		MonState = EMonState::Attack;
 	}
@@ -192,7 +191,7 @@ void UMonFsm::LineDestination()
 	FVector Start = Monster->GetActorLocation() + RandLocation(RandLocationFloat,RandLocationFloat) + FVector(0,0,2000);
 	FVector End = Start + FVector(0,0, -10000);
 	
-	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Start,End,ECC_GameTraceChannel1,Params);
+	bool bHit = GetWorld()->LineTraceSingleByObjectType(Hit,Start,End,ECC_GameTraceChannel1,Params);
 	if(bHit)
 	{
 		TargetLocation = Hit.ImpactPoint;
@@ -221,12 +220,12 @@ TArray<FOverlapResult> UMonFsm::OverlapMultiResult(float Distance)
 	TArray<FOverlapResult>Results;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(Monster);
-
-	DrawDebugSphere(GetWorld(),Monster->GetActorLocation(),Distance,15,FColor::Yellow,false,1);
 	
 	GetWorld()->OverlapMultiByChannel(Results,Monster->GetActorLocation(),
 		FQuat::Identity, ECC_Visibility,
 		FCollisionShape::MakeSphere(Distance),Params);
+
+	// DrawDebugSphere(GetWorld(),Monster->GetActorLocation(),Distance,15,FColor::Yellow,false,1)
 
 	return Results;
 }

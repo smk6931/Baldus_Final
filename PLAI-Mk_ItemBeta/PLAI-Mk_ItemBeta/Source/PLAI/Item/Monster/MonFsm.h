@@ -83,7 +83,7 @@ public:
 	
 	FHitResult LineTraceResult(FVector Location);
 	
-    TArray<FOverlapResult>OverlapMultiResult(float Distance = 1200.0f);
+    TArray<FOverlapResult>OverlapMultiResult(float Distance = 1500.0f);
 
 	bool bTimer = false;
 	bool bRotator =false;
