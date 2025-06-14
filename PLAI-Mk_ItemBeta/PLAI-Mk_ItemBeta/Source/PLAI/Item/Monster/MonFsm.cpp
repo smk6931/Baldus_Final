@@ -88,14 +88,11 @@ void UMonFsm::AroundVoid(float AttackRange)
 	 AttackAroundTime += GetWorld()->GetDeltaSeconds();
 	if (AttackAroundTime <= GetWorld()->GetDeltaSeconds())
 	{
-		UE_LOG(LogTemp,Warning,TEXT("UMonFsm::AroundVoid 테스트 플레이어 찾는중임"));
-		
 		for (FOverlapResult Result : OverlapMultiResult())
 		{
-			UE_LOG(LogTemp,Warning,TEXT("UMonFsm::AroundVoid 테스트 플레이어 찾는중임 엑터이름은?[%s]"),*Result.GetActor()->GetName());
+			// UE_LOG(LogTemp,Warning,TEXT("UMonFsm::AroundVoid 테스트 플레이어 찾는중임 엑터이름은?[%s]"),*Result.GetActor()->GetName());
 			if (ATestPlayer* Player = Cast<ATestPlayer>(Result.GetActor()))
 			{
-				UE_LOG(LogTemp,Warning,TEXT("UMonFsm::AroundVoid 테스트 플레이어 찾았음"));
 				TestPlayer = Player;
 				TargetLocation = LineTraceResult(TestPlayer->GetActorLocation()).ImpactPoint;
 				
@@ -126,8 +123,13 @@ void UMonFsm::AroundVoid(float AttackRange)
 	FVector Distance = TargetLocation - Monster->GetActorLocation();
 	if (Distance.Length() > 75)
 	{
-		FRotator Rotator = UKismetMathLibrary::MakeRotFromYZ(Monster->GetActorRightVector(),Hit.ImpactNormal);
-		FRotator LerpRotator = UKismetMathLibrary::RLerp(Monster->GetActorRotation(),Rotator,GetWorld()->GetDeltaSeconds() * 5.0f,true);
+		FRotator Rotator = UKismetMathLibrary::MakeRotFromYZ
+		(Monster->GetActorRightVector(),Hit.ImpactNormal);
+		
+		FRotator LerpRotator = UKismetMathLibrary::RLerp
+		(Monster->GetActorRotation(),Rotator,
+			
+			GetWorld()->GetDeltaSeconds() * 5.0f,true);
 		Monster->SetActorRotation(LerpRotator);
 	}
 	Monster->AddActorWorldOffset(Distance.GetSafeNormal()*10,false);
@@ -238,10 +240,6 @@ TArray<FOverlapResult> UMonFsm::OverlapMultiResult(float Distance)
 	GetWorld()->OverlapMultiByChannel(Results,Monster->GetActorLocation(),
 		FQuat::Identity, ECC_Visibility,
 		FCollisionShape::MakeSphere(Distance),Params);
-
-	// DrawDebugCircle(GetWorld(),Monster->GetActorLocation(),Distance,15,FColor::Yellow,false,1 ,0,
-	// 	0.0f,FVector(1, 0, 0),FVector(0, 1, 0),false);
-
 	return Results;
 }
 

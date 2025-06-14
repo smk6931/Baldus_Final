@@ -21,6 +21,5 @@ void UUiChaView::SetUiChaView(FUserFullInfo UserFullInfo)
 
 	CurrentHp->SetText(FText::AsNumber(UserFullInfo.character_info.CurrentHp));
 	MaxHp->SetText(FText::AsNumber(UserFullInfo.character_info.MaxHp));
-	HpBar->SetPercent(static_cast<float>(UserFullInfo.character_info.current_exp) /  static_cast<float>(UserFullInfo.character_info.MaxHp));
-
+	HpBar->SetPercent(static_cast<float>(UserFullInfo.character_info.CurrentHp) / static_cast<float>(UserFullInfo.character_info.MaxHp));
 }
