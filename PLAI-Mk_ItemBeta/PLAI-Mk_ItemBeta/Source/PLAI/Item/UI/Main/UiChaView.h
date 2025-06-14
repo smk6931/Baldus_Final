@@ -26,16 +26,19 @@ public:
 	class UTextBlock* LevCha;
 
 	UPROPERTY(meta = (BindWidget = "Widget"))
-	class UTextBlock* ExpCha;
-
-	UPROPERTY(meta = (BindWidget = "Widget"))
 	class UTextBlock* CurrentHp;
 
 	UPROPERTY(meta = (BindWidget = "Widget"))
 	class UTextBlock* MaxHp;
 
 	UPROPERTY(meta = (BindWidget = "Widget"))
+	class UProgressBar* HpBar;
+
+	UPROPERTY(meta = (BindWidget = "Widget"))
 	class UTextBlock* MaxExpCha;
+
+	UPROPERTY(meta = (BindWidget = "Widget"))
+	class UTextBlock* ExpCha;
 
 	UPROPERTY(meta = (BindWidget = "Widget"))
 	class UTextBlock* ExpPercent;
@@ -44,7 +47,10 @@ public:
 	class UProgressBar* ExpBar;
 
 	UPROPERTY(meta = (BindWidget = "Widget"))
-	class UProgressBar* HpBar;
+	class UTextBlock* CurrentMp;
+
+	UPROPERTY(meta = (BindWidget = "Widget"))
+	class UTextBlock* MaxMp;
 	
 	UPROPERTY(meta = (BindWidget = "Widget"))
 	class UProgressBar* MpBar;

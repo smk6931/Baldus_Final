@@ -680,15 +680,14 @@ void UInvenComp::GetLevel()
 		if (TestPlayer->LoginComp->UserFullInfo.character_info.current_exp < LevelStruct->Exp)
 		{
 			UE_LOG(LogTemp,Warning,TEXT("InvenComp GetLevel에서 넘기는 레벨 배열 크기는? [%d]"),Levels.Num())
-			
-			LevelCounts.Add(LevelStruct->level);
-			UiGetLevel(LevelCounts);
 			return;
 		}
 		if (TestPlayer->LoginComp->UserFullInfo.character_info.level == LevelStruct->level &&
 			TestPlayer->LoginComp->UserFullInfo.character_info.current_exp >= LevelStruct->Exp)
 		{
 			LevelCounts.Add(LevelStruct->level);
+			UiGetLevel(LevelCounts);
+			
 			UE_LOG(LogTemp,Warning,TEXT("InvenComp GetLevel에서 레벨스에 담기는 LevelStruct->level 값은? [%d]"),LevelStruct->level)
 			TestPlayer->LoginComp->UserFullInfo.character_info.current_exp -= LevelStruct->Exp;
 			TestPlayer->LoginComp->UserFullInfo.character_info.max_exp = NextLevelStruct->Exp;
