@@ -30,7 +30,7 @@ UCreFsm::UCreFsm()
 void UCreFsm::BeginPlay()
 {
 	Super::BeginPlay();
-	// TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+	TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 	Creature = Cast<ACreature>(GetOwner());
 	// ...
 }
@@ -80,8 +80,11 @@ void UCreFsm::AttackMonster(AMonster* Monster)
 	if (Monster->MonsterStruct.CurrentHp <= 0)
 	{
 		CreStruct.CurrentExp += Monster->MonsterStruct.Exp;
+		TestPlayer->InvenComp->GetExp(Monster->MonsterStruct.Exp);
+		
 		Monster->Dead();
 		GetMonGold(Monster);
+		
 		SetCreStat();
 	}
 }
